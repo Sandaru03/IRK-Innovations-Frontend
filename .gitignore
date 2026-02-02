@@ -20,6 +20,3 @@ build/
 # OS files
 .DS_Store
 Thumbs.db
-
-# Large media
-public/Herovideo.mp4
