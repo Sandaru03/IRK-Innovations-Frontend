@@ -166,7 +166,6 @@ const HomePage = () => {
             <h3 className="text-3xl md:text-4xl font-bold text-slate-900">End-to-End Electronics Engineering</h3>
           </div>
 
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               { 
