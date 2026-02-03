@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
+import ProjectCard from '../components/ProjectCard';
 import { 
   Menu, X, Phone, Cpu, Settings, Wrench, 
   Globe, Zap, ArrowRight, ShieldCheck, 
@@ -8,45 +11,19 @@ import {
 const HomePage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Project Data extracted from your document [cite: 23-64]
-  const projects = [
-    { 
-      title: "Hoist Protection System", 
-      category: "Industrial Safety", 
-      desc: "Implemented at Keells retail outlets to prevent overloading and ensure safe stock handling.",
-      icon: <ShieldCheck size={24} className="text-white" />
-    },
-    { 
-      title: "Smart AC Control System", 
-      category: "IoT & Energy Saving", 
-      desc: "Automated climate control with mobile app integration to optimize electricity consumption in supermarkets.",
-      icon: <Zap size={24} className="text-white" />
-    },
-    { 
-      title: "Smartlife Hub Devices", 
-      category: "Export (New Zealand)", 
-      desc: "Designed and manufactured 300+ IoT hub devices for Smartlife NZ for home automation systems.",
-      icon: <Globe size={24} className="text-white" />
-    },
-    { 
-      title: "Smart Gate Control", 
-      category: "Home Automation", 
-      desc: "Remote gate operation via Android/iOS app with real-time status monitoring.",
-      icon: <Smartphone size={24} className="text-white" />
-    },
-    { 
-      title: "Heat Seal Controller", 
-      category: "Industrial Automation", 
-      desc: "Custom controller unit for heat seal machines with precise timing and temperature logic.",
-      icon: <Settings size={24} className="text-white" />
-    },
-    { 
-      title: "Tech Product Sourcing", 
-      category: "Global Sourcing", 
-      desc: "Sourcing specialized tech products (e.g., Wind Temp Meters) directly from manufacturers in China.",
-      icon: <Truck size={24} className="text-white" />
-    },
-  ];
+  const [apiProjects, setApiProjects] = useState([]);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/projects');
+        setApiProjects(response.data.slice(0, 3)); // Display only top 3 projects
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      }
+    };
+    fetchProjects();
+  }, []);
 
   return (
     <div className="font-sans text-slate-800 bg-white">
@@ -209,48 +186,25 @@ const HomePage = () => {
               <h2 className="text-blue-600 font-bold tracking-wider uppercase text-sm mb-2">Our Portfolio</h2>
               <h3 className="text-3xl md:text-4xl font-bold text-slate-900">Recent Innovations</h3>
             </div>
-            <button className="hidden md:flex items-center text-blue-600 font-semibold hover:text-blue-800 transition">
+            <Link to="/projects" className="hidden md:flex items-center text-blue-600 font-semibold hover:text-blue-800 transition">
               View All Projects <ArrowRight size={20} className="ml-2" />
-            </button>
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map((project, index) => (
-              <div key={index} className="group relative bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-300 flex flex-col h-full">
-                {/* Visual Header */}
-                <div className="h-2 bg-linear-to-r from-blue-500 to-cyan-400"></div>
-                
-                <div className="p-8 flex flex-col grow">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="p-3 bg-slate-900 rounded-lg shadow-lg group-hover:scale-110 transition-transform duration-300">
-                      {project.icon}
-                    </div>
-                    <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wide rounded-full">
-                      {project.category}
-                    </span>
-                  </div>
-                  
-                  <h4 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors">
-                    {project.title}
-                  </h4>
-                  <p className="text-slate-600 text-sm mb-6 grow leading-relaxed">
-                    {project.desc}
-                  </p>
-                  
-                  <div className="pt-6 border-t border-slate-100 mt-auto">
-                    <span className="text-sm font-semibold text-slate-400 group-hover:text-blue-600 flex items-center transition-colors">
-                      See Case Study <ArrowRight size={16} className="ml-2" />
-                    </span>
-                  </div>
-                </div>
-              </div>
-            ))}
+            {apiProjects.length > 0 ? (
+              apiProjects.map((project) => (
+                <ProjectCard key={project._id} project={project} />
+              ))
+            ) : (
+             <p className="text-center w-full col-span-3 text-slate-500">No projects added yet.</p>
+            )}
           </div>
           
           <div className="mt-12 text-center md:hidden">
-            <button className="bg-slate-100 text-slate-900 px-6 py-3 rounded-lg font-bold w-full">
+            <Link to="/projects" className="bg-slate-100 text-slate-900 px-6 py-3 rounded-lg font-bold w-full inline-block">
               View All Projects
-            </button>
+            </Link>
           </div>
         </div>
       </section>
