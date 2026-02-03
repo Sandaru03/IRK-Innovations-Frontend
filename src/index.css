@@ -1,1 +1,34 @@
 @import "tailwindcss";
+
+/* Global Dark Theme Overrides */
+:root {
+  color-scheme: dark;
+}
+
+body {
+  background-color: #09090b; /* Zinc 950 */
+  color: #fbbf24; /* Amber/Yellow 400 base text or slate-200, adjusted below */
+}
+
+/* Custom Scrollbar - Volt Yellow */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #18181b; /* Zinc 900 */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ca8a04; /* Yellow 600 */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #eab308; /* Yellow 500 */
+}
+
+::selection {
+  background-color: #facc15; /* Yellow 400 */
+  color: #000;
+}

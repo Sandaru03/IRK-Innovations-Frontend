@@ -33,9 +33,9 @@ const ProjectDetails = () => {
 
   if (!project) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-white">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Project Not Found</h2>
-        <Link to="/" className="text-blue-600 hover:underline flex items-center gap-2">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-950">
+        <h2 className="text-2xl font-bold text-white mb-4">Project Not Found</h2>
+        <Link to="/" className="text-yellow-500 hover:text-yellow-400 flex items-center gap-2">
           <ArrowLeft size={20} /> Back to Home
         </Link>
       </div>
@@ -43,15 +43,15 @@ const ProjectDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white font-sans text-slate-800 pb-20">
+    <div className="min-h-screen bg-zinc-950 font-sans text-zinc-300 pb-20">
       
       {/* Navigation Bar */}
-      <nav className="border-b border-gray-200 bg-white sticky top-0 z-50">
+      <nav className="border-b border-zinc-800 bg-zinc-950 sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center text-slate-600 hover:text-blue-600 transition font-medium">
+          <Link to="/" className="flex items-center text-zinc-400 hover:text-yellow-500 transition font-medium">
             <ArrowLeft size={20} className="mr-2" /> Back to Home
           </Link>
-          <div className="text-xl font-bold text-slate-900 tracking-tight">IRK <span className="text-blue-600">INNOVATIONS</span></div>
+          <div className="text-xl font-bold text-white tracking-tight">VOLT<span className="text-yellow-500">ENG</span></div>
         </div>
       </nav>
 
@@ -59,36 +59,36 @@ const ProjectDetails = () => {
       <div className="max-w-4xl mx-auto px-6 py-12 sm:px-8">
         
         {/* Header Section */}
-        <header className="mb-12 border-b-2 border-slate-100 pb-8">
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-6 leading-tight">
+        <header className="mb-12 border-b border-zinc-800 pb-8">
+          <h1 className="text-4xl sm:text-5xl font-black text-white mb-6 leading-tight uppercase italic">
             {project.title}
           </h1>
           <div className="flex flex-wrap gap-4 items-center">
             {project.liveLink && (
-               <a href={project.liveLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-semibold hover:bg-blue-100 transition">
+               <a href={project.liveLink} target="_blank" rel="noopener noreferrer" className="inline-flex items-center px-4 py-2 bg-yellow-500 text-black rounded-sm font-bold hover:bg-yellow-400 transition">
                  <ExternalLink size={18} className="mr-2" /> Live Demo
                </a>
             )}
-            <span className="text-slate-500 text-sm">Published on {new Date(project.createdAt).toLocaleDateString()}</span>
+            <span className="text-zinc-500 text-sm font-mono">PUBLISHED: {new Date(project.createdAt).toLocaleDateString()}</span>
           </div>
         </header>
 
         {/* Main Hero Image */}
-        <div className="mb-12 rounded-xl overflow-hidden shadow-sm border border-slate-200">
+        <div className="mb-12 border border-zinc-800">
           <img 
             src={project.mainImage} 
             alt={project.title} 
-            className="w-full h-auto object-cover max-h-[600px]"
+            className="w-full h-auto object-cover max-h-[600px] grayscale hover:grayscale-0 transition-all duration-700"
           />
         </div>
 
         {/* Description Section */}
         <section className="mb-16">
-           <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center">
-             <span className="w-10 h-1 bg-blue-600 mr-4 rounded-full"></span>
+           <h2 className="text-2xl font-bold text-white mb-6 flex items-center uppercase tracking-wider">
+             <span className="w-2 h-8 bg-yellow-500 mr-4"></span>
              Overview
            </h2>
-           <div className="prose prose-lg text-slate-600 max-w-none whitespace-pre-wrap leading-relaxed space-y-4">
+           <div className="prose prose-lg prose-invert text-zinc-400 max-w-none whitespace-pre-wrap leading-relaxed space-y-4">
              {project.description}
            </div>
         </section>
@@ -96,17 +96,17 @@ const ProjectDetails = () => {
         {/* Detail Images Gallery */}
         {project.detailImages && project.detailImages.length > 0 && (
           <section className="mb-16">
-            <h2 className="text-2xl font-bold text-slate-900 mb-8 flex items-center">
-              <span className="w-10 h-1 bg-blue-600 mr-4 rounded-full"></span>
+            <h2 className="text-2xl font-bold text-white mb-8 flex items-center uppercase tracking-wider">
+              <span className="w-2 h-8 bg-yellow-500 mr-4"></span>
               Project Gallery
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {project.detailImages.map((img, index) => (
-                <div key={index} className="rounded-xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-md transition">
+                <div key={index} className="border border-zinc-800 hover:border-yellow-500/50 transition duration-300">
                   <img 
                     src={img} 
                     alt={`Detail ${index + 1}`} 
-                    className="w-full h-full object-cover transform hover:scale-105 transition duration-500"
+                    className="w-full h-full object-cover cursor-pointer hover:opacity-80 transition"
                   />
                 </div>
               ))}
@@ -117,11 +117,11 @@ const ProjectDetails = () => {
         {/* Video Section */}
         {project.video && (
           <section className="mb-16">
-            <h2 className="text-2xl font-bold text-slate-900 mb-8 flex items-center">
-               <span className="w-10 h-1 bg-blue-600 mr-4 rounded-full"></span>
+            <h2 className="text-2xl font-bold text-white mb-8 flex items-center uppercase tracking-wider">
+               <span className="w-2 h-8 bg-yellow-500 mr-4"></span>
                Project Demonstration
             </h2>
-            <div className="rounded-xl overflow-hidden shadow-lg border border-slate-200 bg-black aspect-video relative">
+            <div className="border border-zinc-800 bg-black aspect-video relative">
               <video 
                 controls 
                 className="w-full h-full"
@@ -134,11 +134,11 @@ const ProjectDetails = () => {
         )}
 
         {/* Footer CTA */}
-        <div className="mt-20 pt-10 border-t border-slate-200 text-center">
-          <h3 className="text-2xl font-bold text-slate-900 mb-4">Interested in a similar solution?</h3>
-          <p className="text-slate-600 mb-8">Contact us to discuss how we can engineer a solution for you.</p>
+        <div className="mt-20 pt-10 border-t border-zinc-800 text-center">
+          <h3 className="text-2xl font-bold text-white mb-4 uppercase italic">Interested in a similar solution?</h3>
+          <p className="text-zinc-500 mb-8">Contact us to discuss how we can engineer a solution for you.</p>
           <div className="flex justify-center gap-4">
-            <Link to="/#contact" className="px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition shadow-lg">
+            <Link to="/#contact" className="px-8 py-3 bg-yellow-500 text-black font-bold uppercase tracking-widest hover:bg-yellow-400 transition shadow-[0_0_15px_rgba(234,179,8,0.2)]">
               Contact Us
             </Link>
           </div>

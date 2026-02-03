@@ -2,193 +2,246 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import ProjectCard from '../components/ProjectCard';
+import NavBar from '../components/NavBar';
+import Footer from '../components/Footer';
 import { 
-  Menu, X, Phone, Cpu, Settings, Wrench, 
-  Globe, Zap, ArrowRight, ShieldCheck, 
-  Lightbulb, Truck, Smartphone 
+  CheckCircle, ArrowRight, Phone, Mail, MapPin, 
+  ChevronLeft, ChevronRight, Zap 
 } from 'lucide-react';
 
 const HomePage = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
   const [apiProjects, setApiProjects] = useState([]);
-  const [showViewAll, setShowViewAll] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Hero Slider Images (Placeholders)
+  const slides = [
+    {
+      image: "https://images.unsplash.com/photo-1513828583688-c52646db42da?q=80&w=2070&auto=format&fit=crop",
+      title: "Solutions Engineered for Impact",
+    },
+    {
+      image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop",
+      title: "Precision Manufacturing",
+    },
+    {
+      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop",
+      title: "Smart Electronic Integration",
+    }
+  ];
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/projects');
         setApiProjects(response.data); 
-        setShowViewAll(response.data.length > 6);
       } catch (error) {
         console.error('Error fetching projects:', error);
       }
     };
     fetchProjects();
+
+    const sliderInterval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+
+    return () => clearInterval(sliderInterval);
   }, []);
 
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
+  const prevSlide = () => setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
+
   return (
-    <div className="font-sans text-slate-800 bg-white">
+    <div className="font-sans text-slate-200 bg-zinc-950 min-h-screen">
       
-      {/* ================= NAVBAR ================= */}
-      <nav className="bg-white shadow-lg fixed w-full z-50 transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            
-            {/* Logo [cite: 1] */}
-            <div className="shrink-0 flex items-center gap-2">
-              <div className="bg-blue-900 p-2 rounded-lg">
-                <Cpu size={24} className="text-white" />
-              </div>
-              <span className="font-bold text-2xl text-slate-900 tracking-tight">
-                IRK <span className="text-blue-600">INNOVATIONS</span>
-              </span>
-            </div>
+      <NavBar />
 
-            {/* Desktop Menu [cite: 4] */}
-            <div className="hidden md:flex items-center space-x-8">
-              {['Home', 'About', 'Services', 'Projects', 'Contact'].map((item) => (
-                <a key={item} href={`#${item.toLowerCase()}`} className="text-slate-600 hover:text-blue-600 font-medium transition hover:-translate-y-0.5">
-                  {item}
-                </a>
-              ))}
-            </div>
-
-            {/* Right Side CTA */}
-            <div className="hidden md:flex items-center gap-4">
-              <a href="tel:+94771234567" className="flex items-center text-slate-700 font-semibold hover:text-blue-600 transition">
-                <Phone size={18} className="mr-2" />
-                <span>+94 XX XXX XXXX</span>
-              </a>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-full font-medium transition shadow-md hover:shadow-lg transform hover:scale-105">
-                Contact Us
-              </button>
-            </div>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden flex items-center">
-              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-slate-600 hover:text-blue-900">
-                {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100 py-4 px-4 shadow-xl">
-            <div className="flex flex-col space-y-4">
-              {['Home', 'About', 'Services', 'Projects', 'Contact'].map((item) => (
-                <a key={item} href={`#${item.toLowerCase()}`} className="text-slate-700 font-medium hover:text-blue-600">
-                  {item}
-                </a>
-              ))}
-              <div className="pt-4 border-t border-gray-100">
-                 <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold">Request Consultation</button>
-              </div>
-            </div>
-          </div>
-        )}
-      </nav>
-
-      {/* ================= HERO SECTION ================= */}
-      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 bg-slate-900 overflow-hidden">
-        {/* Video Background */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-slate-900/80 z-10"></div>
-          <video 
-            autoPlay 
-            loop 
-            muted 
-            playsInline
-            className="w-full h-full object-cover"
-          >
-            <source src="/Herovideo.mp4" type="video/mp4" />
-          </video>
-        </div>
+      {/* ================= HERO SECTION (SLIDER) ================= */}
+      <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
+        {/* Background Slider */}
+        {slides.map((slide, index) => (
+           <div 
+             key={index}
+             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
+           >
+              <div className="absolute inset-0 bg-black/70 z-10"></div> {/* Overlay */}
+              <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" />
+           </div>
+        ))}
         
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-sm font-semibold mb-6">
-              <span className="flex h-2 w-2 rounded-full bg-blue-400 mr-2 animate-pulse"></span>
-              10+ Years of Industry Experience 
-            </div>
-            
-            <h1 className="text-4xl md:text-6xl font-bold text-white leading-tight mb-6">
-              You Bring the Problem, <br/>
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-blue-400 to-cyan-300">
-                We Build the Solution.
+        {/* Slider Controls */}
+        <button onClick={prevSlide} className="absolute left-4 md:left-8 z-30 p-2 text-white/50 hover:text-yellow-500 transition-colors">
+           <ChevronLeft size={48} />
+        </button>
+        <button onClick={nextSlide} className="absolute right-4 md:right-8 z-30 p-2 text-white/50 hover:text-yellow-500 transition-colors">
+           <ChevronRight size={48} />
+        </button>
+
+        {/* Content */}
+        <div className="relative z-20 max-w-5xl mx-auto px-4 text-center mt-16">
+           <div className="inline-block mb-6 px-4 py-1 border border-yellow-500/50 rounded-full bg-yellow-500/10 backdrop-blur-sm">
+              <span className="text-yellow-400 font-bold tracking-widest uppercase text-xs md:text-sm">
+                Industrial Innovation Partner
               </span>
-            </h1>
-            
-            <p className="text-lg md:text-xl text-slate-300 mb-8 leading-relaxed max-w-2xl">
-                        We design, manufacture & deliver smart electronic products with over 10 years of industry experience.            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition shadow-lg flex items-center justify-center">
-                View Our Projects <ArrowRight size={20} className="ml-2" />
-              </button>
-              <button className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 px-8 py-4 rounded-lg font-bold text-lg transition">
-                Our Services
-              </button>
-            </div>
-          </div>
+           </div>
+
+           <h1 className="text-4xl md:text-7xl font-black text-white leading-tight mb-8">
+             Customized Electronics Solutions <br/>
+             <span className="text-yellow-500">From Idea to Installation</span>
+           </h1>
+
+           <p className="text-lg md:text-2xl text-zinc-300 mb-10 max-w-3xl mx-auto font-light leading-relaxed">
+             We design, manufacture & deliver smart electronic products with over <span className="text-white font-semibold">10 years</span> of industry experience.
+           </p>
+
+           <div className="flex flex-col sm:flex-row gap-6 justify-center">
+             <a href="#projects" className="bg-yellow-500 text-black px-10 py-4 font-bold uppercase tracking-widest hover:bg-yellow-400 transition-colors shadow-[0_0_20px_rgba(234,179,8,0.3)]">
+               View Projects
+             </a>
+             <a href="#contact" className="bg-transparent border-2 border-white text-white px-10 py-4 font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-colors">
+               Contact Us
+             </a>
+           </div>
+        </div>
+
+        {/* Slide Indicators */}
+        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-30 flex gap-3">
+           {slides.map((_, idx) => (
+             <button 
+               key={idx} 
+               onClick={() => setCurrentSlide(idx)}
+               className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentSlide ? 'w-12 bg-yellow-500' : 'w-4 bg-white/30 hover:bg-white/50'}`}
+             />
+           ))}
         </div>
       </section>
 
-
-      {/* ================= SERVICES GRID [cite: 10-21] ================= */}
-      <section id="services" className="py-24 bg-slate-50">
+      {/* ================= WHY CHOOSE US ================= */}
+      <section id="why-us" className="py-24 bg-zinc-900 border-y border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-blue-600 font-bold tracking-wider uppercase text-sm mb-2">What We Do</h2>
-            <h3 className="text-3xl md:text-4xl font-bold text-slate-900">End-to-End Electronics Engineering</h3>
-          </div>
+           <div className="text-center mb-16">
+              <h2 className="text-yellow-500 font-bold tracking-widest uppercase mb-3">Core Strengths</h2>
+              <h3 className="text-3xl md:text-5xl font-black text-white uppercase italic">Why Choose Us</h3>
+           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { 
-                icon: <Lightbulb size={32} />, 
-                title: "Design & Consultation", 
-                desc: "Architecture design, schematic capture, and electronics engineering consultation[cite: 10, 13]." 
-              },
-              { 
-                icon: <Settings size={32} />, 
-                title: "Manufacturing (DFM/DFA)", 
-                desc: "Cost optimization (BOM), PCB assembly, and bulk manufacturing with enclosure design[cite: 15, 16, 20]." 
-              },
-              { 
-                icon: <Zap size={32} />, 
-                title: "Testing & Optimization", 
-                desc: "Rigorous product testing and assembly process optimization to ensure industrial reliability[cite: 14, 18]." 
-              },
-              { 
-                icon: <Truck size={32} />, 
-                title: "Global Sourcing", 
-                desc: "Sourcing specialized tech products and electronic components directly from China[cite: 21, 66]." 
-              }
-            ].map((service, index) => (
-              <div key={index} className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 group">
-                <div className="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
-                  {service.icon}
+           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
+              {[
+                { title: "10+ Years Experience", icon: <CheckCircle className="text-yellow-500" /> },
+                { title: "End-to-End Solutions", icon: <Zap className="text-yellow-500" /> },
+                { title: "Industrial Grade", icon: <CheckCircle className="text-yellow-500" /> },
+                { title: "Cost Optimized", icon: <Zap className="text-yellow-500" /> },
+                { title: "Global Clients", icon: <CheckCircle className="text-yellow-500" /> },
+              ].map((item, index) => (
+                <div key={index} className="flex flex-col items-center text-center p-6 bg-zinc-950 border border-zinc-800 hover:border-yellow-500/50 transition-all group">
+                   <div className="mb-4 p-4 bg-zinc-900 rounded-full group-hover:bg-yellow-500 group-hover:text-black transition-colors text-yellow-500">
+                      {React.cloneElement(item.icon, { size: 32 })}
+                   </div>
+                   <h4 className="text-white font-bold uppercase text-sm tracking-wider">{item.title}</h4>
                 </div>
-                <h4 className="text-xl font-bold text-slate-900 mb-3">{service.title}</h4>
-                <p className="text-slate-600 leading-relaxed text-sm">{service.desc}</p>
-              </div>
-            ))}
-          </div>
+              ))}
+           </div>
         </div>
       </section>
 
-      {/* ================= FEATURED PROJECTS [cite: 23-64] ================= */}
-      <section id="projects" className="py-24 bg-white">
+      {/* ================= PARALLAX FEATURE HIGHLIGHT (Image 1 Style) ================= */}
+      <section className="relative py-32 bg-fixed bg-center bg-cover" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1593941707882-a5bba14938c7?q=80&w=2072&auto=format&fit=crop')" }}>
+        <div className="absolute inset-0 bg-zinc-950/80"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col md:flex-row items-center gap-12">
+           
+           <div className="flex-1">
+              <h2 className="text-4xl md:text-6xl font-black text-white leading-tight uppercase mb-6">
+                Uninterruptible <br/>
+                <span className="text-white">power supply</span> <br/>
+                in your home
+              </h2>
+              <button className="bg-yellow-500 text-black px-8 py-3 font-bold uppercase tracking-widest hover:bg-yellow-400 transition shadow-lg mt-4">
+                + Order Now
+              </button>
+           </div>
+
+           <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-8">
+              {[
+                { icon: <Zap size={32} />, title: "Refined power supply", desc: "Stabilized voltage for sensitive electronics." },
+                { icon: <CheckCircle size={32} />, title: "Protection against issues", desc: "Shields against surges and outages." },
+                { icon: <CheckCircle size={32} />, title: "Effective time saving", desc: "Instant switch-over technology." },
+                { icon: <Zap size={32} />, title: "Consistent power quality", desc: "Pure sine wave output guarantee." }
+              ].map((item, i) => (
+                <div key={i} className="flex gap-4 group">
+                  <div className="text-yellow-500 transition-transform group-hover:scale-110">{item.icon}</div>
+                  <div>
+                    <h4 className="text-white font-bold text-lg mb-1">{item.title}</h4>
+                    <p className="text-zinc-400 text-sm leading-snug">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+           </div>
+        </div>
+      </section>
+
+      {/* ================= FAQ & WHY CHOOSE US (Image 2 Style) ================= */}
+      <section id="faq" className="py-24 bg-zinc-900 border-t border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+           <div className="flex flex-col lg:flex-row gap-16">
+              
+              {/* Left: Accordion */}
+              <div className="flex-1">
+                 <div className="bg-yellow-500 text-black font-bold uppercase tracking-widest text-xs inline-block px-2 py-1 mb-4">Explore FAQ's</div>
+                 <h2 className="text-4xl md:text-5xl font-black text-white uppercase italic leading-tight mb-12">
+                   Popular questions <br/> about our company
+                 </h2>
+
+                 <div className="space-y-4">
+                    {[
+                      { q: "Why to choose us?", a: "Whether you need lighting repairs, electrical upgrades, or a new installation, we're here to provide quality services that meet your needs and exceed your expectations." },
+                      { q: "How quickly can you get help?", a: "Our emergency response team is available 24/7 with a guaranteed 2-hour onsite arrival time for critical failures." },
+                      { q: "How to pay for services?", a: "We accept all credit cards, bank transfers, and offer flexible financing plans for large-scale industrial projects." },
+                      { q: "What to call an electrician?", a: "Call us anytime at +94 76 537 6106 for immediate assistance or consultation." }
+                    ].map((faq, i) => (
+                      <div key={i} className="bg-zinc-950 border border-zinc-800">
+                        <button className="w-full flex justify-between items-center p-6 text-left hover:bg-zinc-900 transition-colors group">
+                           <span className="text-lg font-bold text-white group-hover:text-yellow-500 transition-colors">{faq.q}</span>
+                           <div className="bg-yellow-500 text-black p-1">
+                             <CheckCircle size={16} className="rotate-45" /> 
+                           </div>
+                        </button>
+                        {i === 0 && ( 
+                          <div className="p-6 pt-0 text-zinc-400 text-sm leading-relaxed border-t border-zinc-900">
+                             {faq.a}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                 </div>
+                 
+                 <button className="mt-8 bg-yellow-500 text-black px-8 py-3 font-bold uppercase tracking-widest hover:bg-yellow-400 transition shadow-lg flex items-center gap-2">
+                   + All Questions
+                 </button>
+              </div>
+
+              {/* Right: Images Grid */}
+              <div className="flex-1 relative hidden lg:block">
+                 <div className="aspect-4/5 bg-yellow-500 absolute top-0 right-0 w-2/3 z-0"></div>
+                 <div className="relative z-10 grid grid-cols-2 gap-4 pt-12 pr-8">
+                    <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=2069&auto=format&fit=crop" className="w-full h-64 object-cover border-4 border-zinc-950 shadow-2xl" alt="Worker" />
+                    <img src="https://images.unsplash.com/photo-1558449028-b53a39d100fc?q=80&w=1974&auto=format&fit=crop" className="w-full h-64 object-cover border-4 border-zinc-950 shadow-2xl mt-12" alt="Switch" />
+                    <img src="https://images.unsplash.com/photo-1544724569-5f546fd6f2b5?q=80&w=1974&auto=format&fit=crop" className="w-full h-64 object-cover border-4 border-zinc-950 shadow-2xl col-span-2" alt="Lighting" />
+                 </div>
+              </div>
+
+           </div>
+        </div>
+      </section>
+
+      {/* ================= PROJECTS GRID ================= */}
+      <section id="projects" className="py-24 bg-zinc-950 border-t border-zinc-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-zinc-800 pb-8">
             <div>
-              <h2 className="text-blue-600 font-bold tracking-wider uppercase text-sm mb-2">Our Portfolio</h2>
-              <h3 className="text-3xl md:text-4xl font-bold text-slate-900">Recent Innovations</h3>
+              <h2 className="text-yellow-500 font-bold tracking-widest uppercase mb-2">Our Portfolio</h2>
+              <h3 className="text-3xl md:text-5xl font-black text-white uppercase italic">Featured Projects</h3>
             </div>
-            
+            <Link to="/projects" className="hidden md:flex items-center text-zinc-400 hover:text-yellow-500 font-bold uppercase tracking-widest transition mt-4 md:mt-0">
+               View Full Archive <ArrowRight size={20} className="ml-2" />
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -197,86 +250,53 @@ const HomePage = () => {
                 <ProjectCard key={project._id} project={project} />
               ))
             ) : (
-             <p className="text-center w-full col-span-3 text-slate-500">No projects added yet.</p>
+              <p className="text-zinc-600 col-span-3 text-center py-10">No projects to display.</p>
             )}
           </div>
-          
-          {showViewAll && (
-            <div className="mt-12 text-center">
-              <Link to="/projects" className="bg-slate-100 text-slate-900 px-6 py-3 rounded-lg font-bold inline-flex items-center hover:bg-slate-200 transition">
-                View All Projects <ArrowRight size={20} className="ml-2" />
-              </Link>
-            </div>
-          )}
-          
-        </div>
-      </section>
 
-      {/* ================= CTA / PHILOSOPHY  ================= */}
-      <section className="py-20 bg-blue-900 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <svg className="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-             <path d="M0 100 L100 0 L100 100 Z" fill="white" />
-          </svg>
-        </div>
-        
-        <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
-            "We need your problem only. <br/>We will give you the solution."
-          </h2>
-          <p className="text-blue-200 text-lg mb-10 max-w-2xl mx-auto">
-            Whether it's a simple circuit design or a complex industrial automation system, we have the expertise to deliver results.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button className="bg-white text-blue-900 hover:bg-blue-50 px-10 py-4 rounded-lg font-bold text-lg transition shadow-xl">
-              Request Consultation
-            </button>
-            <button className="bg-transparent border-2 border-white/30 text-white hover:bg-white/10 px-10 py-4 rounded-lg font-bold text-lg transition">
-              Call Us Now
-            </button>
+          <div className="mt-12 text-center md:hidden">
+            <Link to="/projects" className="inline-block border border-zinc-700 text-white px-8 py-3 uppercase tracking-widest font-bold hover:border-yellow-500 hover:text-yellow-500 transition">
+              View All Projects
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* ================= FOOTER ================= */}
-      <footer className="bg-slate-950 text-slate-400 pt-16 pb-8 border-t border-slate-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-            <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center gap-2 text-white mb-6">
-                <Cpu size={24} className="text-blue-500" />
-                <span className="font-bold text-xl">IRK INNOVATIONS</span>
-              </div>
-              <p className="text-sm leading-relaxed max-w-sm mb-6">
-                Specialized in embedded product design, manufacturing, and industrial electronics with over 10 years of experience[cite: 3, 11].
-              </p>
-            </div>
+      {/* ================= CONTACT CTA ================= */}
+      <section id="contact" className="py-24 bg-yellow-500 relative overflow-hidden text-black">
+         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
+         
+         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
+            <h2 className="text-4xl md:text-6xl font-black uppercase italic mb-6 tracking-tighter">
+               Ready to Start?
+            </h2>
+            <p className="text-xl md:text-2xl font-medium mb-10 max-w-2xl mx-auto border-black/10">
+               Let's engineer the future together. Get in touch for a consultation.
+            </p>
             
-            <div>
-              <h4 className="text-white font-bold mb-6">Services</h4>
-              <ul className="space-y-3 text-sm">
-                <li><a href="#" className="hover:text-blue-400 transition">PCB Design</a></li>
-                <li><a href="#" className="hover:text-blue-400 transition">Firmware Development</a></li>
-                <li><a href="#" className="hover:text-blue-400 transition">Industrial Automation</a></li>
-                <li><a href="#" className="hover:text-blue-400 transition">Tech Sourcing</a></li>
-              </ul>
+            <div className="flex flex-col md:flex-row justify-center gap-8 mb-12">
+               <div className="flex items-center justify-center gap-3">
+                  <div className="bg-black/10 p-2 rounded-full"><Phone size={24}/></div>
+                  <span className="font-bold text-lg">+94 76 537 6106</span>
+               </div>
+               <div className="flex items-center justify-center gap-3">
+                  <div className="bg-black/10 p-2 rounded-full"><Mail size={24}/></div>
+                  <span className="font-bold text-lg">info@volteng.com</span>
+               </div>
+               <div className="flex items-center justify-center gap-3">
+                  <div className="bg-black/10 p-2 rounded-full"><MapPin size={24}/></div>
+                  <span className="font-bold text-lg">Colombo, Sri Lanka</span>
+               </div>
             </div>
 
-            <div>
-              <h4 className="text-white font-bold mb-6">Contact</h4>
-              <ul className="space-y-3 text-sm">
-                <li>Colombo, Sri Lanka</li>
-                <li>+94 XX XXX XXXX</li>
-                <li>info@irkinnovations.com</li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="border-t border-slate-900 pt-8 text-center text-sm">
-            <p>&copy; {new Date().getFullYear()} IRK Innovations. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+            <button className="bg-black text-white px-12 py-5 font-bold uppercase tracking-widest text-lg hover:scale-105 transition-transform shadow-2xl">
+               Request Free Consultation
+            </button>
+         </div>
+      </section>
+
+      <Footer />
+
     </div>
   );
 };
