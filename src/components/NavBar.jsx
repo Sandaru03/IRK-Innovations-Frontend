@@ -21,11 +21,14 @@ const NavBar = () => {
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">
-            {['Home', 'Services', 'Projects', 'Contact'].map((item) => (
-              <a key={item} href={`#${item.toLowerCase()}`} className="text-sm font-bold uppercase tracking-widest text-zinc-400 hover:text-yellow-500 transition-colors">
+            {['Home', 'Services', 'Projects'].map((item) => (
+              <a key={item} href={`/#${item.toLowerCase()}`} className="text-sm font-bold uppercase tracking-widest text-zinc-400 hover:text-yellow-500 transition-colors">
                 {item}
               </a>
             ))}
+            <Link to="/contact" className="text-sm font-bold uppercase tracking-widest text-zinc-400 hover:text-yellow-500 transition-colors">
+               Contact
+            </Link>
           </div>
 
           <div className="hidden md:flex items-center gap-6">

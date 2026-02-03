@@ -116,31 +116,61 @@ const HomePage = () => {
       </section>
 
       {/* ================= WHY CHOOSE US ================= */}
-      <section id="why-us" className="py-24 bg-zinc-900 border-y border-zinc-800">
+      <section id="why-us" className="py-24 bg-zinc-950 border-y border-zinc-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
            <div className="text-center mb-16">
-              <h2 className="text-yellow-500 font-bold tracking-widest uppercase mb-3">Core Strengths</h2>
-              <h3 className="text-3xl md:text-5xl font-black text-white uppercase italic">Why Choose Us</h3>
+              <h2 className="text-yellow-500 font-bold tracking-widest uppercase mb-3 text-sm">Core Strengths</h2>
+              <h3 className="text-4xl md:text-5xl font-black text-white italic tracking-tighter uppercase">Why Choose Us</h3>
            </div>
 
-           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-8">
+           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {[
-                { title: "10+ Years Experience", icon: <CheckCircle className="text-yellow-500" /> },
-                { title: "End-to-End Solutions", icon: <Zap className="text-yellow-500" /> },
-                { title: "Industrial Grade", icon: <CheckCircle className="text-yellow-500" /> },
-                { title: "Cost Optimized", icon: <Zap className="text-yellow-500" /> },
-                { title: "Global Clients", icon: <CheckCircle className="text-yellow-500" /> },
+                { title: "Experience", subtitle: "10+ Years", icon: <CheckCircle /> },
+                { title: "Solutions", subtitle: "End-to-End", icon: <Zap /> },
+                { title: "Quality", subtitle: "Industrial Grade", icon: <CheckCircle /> },
+                { title: "Cost", subtitle: "Optimized", icon: <Zap /> },
+                { title: "Reach", subtitle: "Global Clients", icon: <CheckCircle /> },
               ].map((item, index) => (
-                <div key={index} className="flex flex-col items-center text-center p-6 bg-zinc-950 border border-zinc-800 hover:border-yellow-500/50 transition-all group">
-                   <div className="mb-4 p-4 bg-zinc-900 rounded-full group-hover:bg-yellow-500 group-hover:text-black transition-colors text-yellow-500">
-                      {React.cloneElement(item.icon, { size: 32 })}
+                <div key={index} className="group relative bg-zinc-900/50 border-t border-b border-zinc-800 p-8 flex flex-col items-center justify-between text-center transition-all duration-300 hover:bg-zinc-900 hover:border-yellow-500/30">
+                   
+                   {/* Tech Corners */}
+                   <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-zinc-700 group-hover:border-yellow-500 transition-colors"></div>
+                   <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-zinc-700 group-hover:border-yellow-500 transition-colors"></div>
+
+                   {/* Number Watermark */}
+                   <span className="absolute top-2 right-4 text-4xl font-black text-zinc-900 group-hover:text-yellow-500/10 transition-colors select-none">
+                     0{index + 1}
+                   </span>
+                   
+                   <div className="mb-8 relative">
+                      <div className="text-zinc-500 group-hover:text-yellow-500 transition-colors duration-300 transform group-hover:scale-110">
+                        {React.cloneElement(item.icon, { size: 32, strokeWidth: 1 })}
+                      </div>
+                      <div className="absolute -inset-4 bg-yellow-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                    </div>
-                   <h4 className="text-white font-bold uppercase text-sm tracking-wider">{item.title}</h4>
+                   
+                   <div>
+                     <h4 className="text-white font-bold uppercase text-sm tracking-wider mb-1 group-hover:text-yellow-500 transition-colors">
+                       {item.subtitle}
+                     </h4>
+                   </div>
                 </div>
               ))}
            </div>
         </div>
       </section>
+
+      {/* Scroll To Top Button */}
+      <button 
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className="fixed bottom-8 right-8 z-50 bg-yellow-500 text-black p-3 rounded-full shadow-lg hover:bg-yellow-400 transition-colors group"
+        title="Back to Top"
+      >
+        <div className="flex flex-col items-center">
+            <div className="h-3 w-[2px] bg-black mb-1"></div>
+            <div className="w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-[6px] border-b-black"></div>
+        </div>
+      </button>
 
       {/* ================= PARALLAX FEATURE HIGHLIGHT (Image 1 Style) ================= */}
       <section className="relative py-32 bg-fixed bg-center bg-cover" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1593941707882-a5bba14938c7?q=80&w=2072&auto=format&fit=crop')" }}>
