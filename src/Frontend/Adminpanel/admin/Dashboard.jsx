@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Plus, Trash2, LogOut, LayoutDashboard, Image as ImageIcon, Link as LinkIcon, Github, Edit2 } from 'lucide-react';
+import { Plus, Trash2, LogOut, LayoutDashboard, Image as ImageIcon, Link as LinkIcon, Edit2, Video, Loader } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../../../supabaseClient';
 
 const Dashboard = () => {
   const [projects, setProjects] = useState([]);
@@ -9,11 +10,12 @@ const Dashboard = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    image: '',
-    techStack: '',
-    liveLink: '',
-    githubLink: ''
+    mainImage: '',
+    detailImages: [],
+    video: '',
+    liveLink: ''
   });
+  const [uploading, setUploading] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -50,27 +52,66 @@ const Dashboard = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleFileUpload = async (e, type) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    try {
+      if (type === 'mainImage' || type === 'video') {
+        const file = files[0];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('images') // Use 'images' bucket
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data } = supabase.storage.from('images').getPublicUrl(filePath);
+        setFormData(prev => ({ ...prev, [type]: data.publicUrl }));
+      } else if (type === 'detailImages') {
+        const uploadedUrls = [];
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${Math.random()}-${i}.${fileExt}`;
+          const filePath = `${fileName}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from('images') // Use 'images' bucket
+            .upload(filePath, file);
+
+          if (uploadError) throw uploadError;
+
+          const { data } = supabase.storage.from('images').getPublicUrl(filePath);
+          uploadedUrls.push(data.publicUrl);
+        }
+        setFormData(prev => ({ ...prev, detailImages: [...prev.detailImages, ...uploadedUrls] }));
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      alert('Error uploading file: ' + error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Convert comma-separated tech stack to array
-      const techStackArray = formData.techStack.split(',').map(item => item.trim());
-      
-      const projectData = {
-        ...formData,
-        techStack: techStackArray
-      };
-
       if (editingProject) {
-        await axios.put(`http://localhost:5000/api/projects/${editingProject._id}`, projectData, config);
+        await axios.put(`http://localhost:5000/api/projects/${editingProject._id}`, formData, config);
       } else {
-        await axios.post('http://localhost:5000/api/projects', projectData, config);
+        await axios.post('http://localhost:5000/api/projects', formData, config);
       }
       
       fetchProjects();
       closeModal();
     } catch (error) {
-      alert('Error saving project');
+alert('Error saving project');
       console.error(error);
     }
   };
@@ -81,20 +122,20 @@ const Dashboard = () => {
       setFormData({
         title: project.title,
         description: project.description,
-        image: project.image,
-        techStack: project.techStack.join(', '),
-        liveLink: project.liveLink || '',
-        githubLink: project.githubLink || ''
+        mainImage: project.mainImage,
+        detailImages: project.detailImages || [],
+        video: project.video || '',
+        liveLink: project.liveLink || ''
       });
     } else {
       setEditingProject(null);
       setFormData({
         title: '',
         description: '',
-        image: '',
-        techStack: '',
-        liveLink: '',
-        githubLink: ''
+        mainImage: '',
+        detailImages: [],
+        video: '',
+        liveLink: ''
       });
     }
     setIsModalOpen(true);
@@ -106,10 +147,10 @@ const Dashboard = () => {
     setFormData({
       title: '',
       description: '',
-      image: '',
-      techStack: '',
-      liveLink: '',
-      githubLink: ''
+      mainImage: '',
+      detailImages: [],
+      video: '',
+      liveLink: ''
     });
   };
 
@@ -169,7 +210,7 @@ const Dashboard = () => {
           {projects.map((project) => (
             <div key={project._id} className="bg-white dark:bg-zinc-800 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-700 overflow-hidden">
               <div className="h-48 overflow-hidden relative group">
-                <img src={project.image} alt={project.title} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                <img src={project.mainImage} alt={project.title} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
                 <div className="absolute top-2 right-2 flex gap-2">
                   <button
                     onClick={() => openModal(project)}
@@ -188,13 +229,6 @@ const Dashboard = () => {
               <div className="p-4">
                 <h3 className="font-bold text-lg text-zinc-900 dark:text-white mb-2">{project.title}</h3>
                 <p className="text-zinc-500 dark:text-zinc-400 text-sm line-clamp-2 mb-4">{project.description}</p>
-                <div className="flex flex-wrap gap-2">
-                  {project.techStack.map((tech, i) => (
-                    <span key={i} className="text-xs bg-gray-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 px-2 py-1 rounded">
-                      {tech}
-                    </span>
-                  ))}
-                </div>
               </div>
             </div>
           ))}
@@ -241,38 +275,65 @@ const Dashboard = () => {
                   ></textarea>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
+                  {/* Main Image Upload */}
                   <div>
-                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Image URL</label>
-                    <div className="relative">
-                      <ImageIcon className="absolute left-3 top-2.5 w-4 h-4 text-zinc-400" />
+                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Main Image</label>
+                    <div className="flex items-center gap-2">
                       <input
-                        type="text"
-                        name="image"
-                        value={formData.image}
-                        onChange={handleChange}
-                        className="w-full rounded-lg border-zinc-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white p-2 pl-9 border"
-                        placeholder="https://..."
-                        required
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleFileUpload(e, 'mainImage')}
+                        className="w-full rounded-lg border-zinc-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white p-2 border"
+                        disabled={uploading}
                       />
+                      {formData.mainImage && (
+                        <div className="h-10 w-10 shrink-0 rounded overflow-hidden">
+                          <img src={formData.mainImage} alt="Main" className="h-full w-full object-cover"/>
+                        </div>
+                      )}
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Tech Stack (comma separated)</label>
-                    <input
-                      type="text"
-                      name="techStack"
-                      value={formData.techStack}
-                      onChange={handleChange}
-                      className="w-full rounded-lg border-zinc-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white p-2 border"
-                      placeholder="React, Node.js, MongoDB"
-                    />
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Detail Images Upload */}
                   <div>
-                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Live Link</label>
+                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Detail Images</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => handleFileUpload(e, 'detailImages')}
+                      className="w-full rounded-lg border-zinc-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white p-2 border"
+                      disabled={uploading}
+                    />
+                     {formData.detailImages.length > 0 && (
+                        <div className="flex gap-2 mt-2 flex-wrap">
+                          {formData.detailImages.map((img, idx) => (
+                             <div key={idx} className="h-10 w-10 rounded overflow-hidden">
+                               <img src={img} alt={`Detail ${idx}`} className="h-full w-full object-cover"/>
+                             </div>
+                          ))}
+                        </div>
+                      )}
+                  </div>
+
+                  {/* Video Upload */}
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Project Video</label>
+                    <div className="flex items-center gap-2">
+                       <input
+                        type="file"
+                        accept="video/*"
+                        onChange={(e) => handleFileUpload(e, 'video')}
+                        className="w-full rounded-lg border-zinc-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white p-2 border"
+                        disabled={uploading}
+                      />
+                       {formData.video && <span className="text-green-500 text-sm">Video uploaded</span>}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Live Link (Optional)</label>
                     <div className="relative">
                       <LinkIcon className="absolute left-3 top-2.5 w-4 h-4 text-zinc-400" />
                       <input
@@ -285,20 +346,6 @@ const Dashboard = () => {
                       />
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">GitHub Link</label>
-                    <div className="relative">
-                      <Github className="absolute left-3 top-2.5 w-4 h-4 text-zinc-400" />
-                      <input
-                        type="text"
-                        name="githubLink"
-                        value={formData.githubLink}
-                        onChange={handleChange}
-                        className="w-full rounded-lg border-zinc-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white p-2 pl-9 border"
-                        placeholder="https://github.com/..."
-                      />
-                    </div>
-                  </div>
                 </div>
 
                 <div className="flex justify-end gap-3 mt-6">
@@ -306,14 +353,17 @@ const Dashboard = () => {
                     type="button"
                     onClick={closeModal}
                     className="px-4 py-2 text-zinc-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-700 rounded-lg transition"
+                    disabled={uploading}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg transition"
+                    className="px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg transition flex items-center justify-center gap-2"
+                    disabled={uploading}
                   >
-                    Save Project
+                     {uploading && <Loader className="w-4 h-4 animate-spin" />}
+                     {uploading ? 'Uploading...' : 'Save Project'}
                   </button>
                 </div>
               </form>

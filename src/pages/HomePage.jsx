@@ -12,12 +12,14 @@ const HomePage = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const [apiProjects, setApiProjects] = useState([]);
+  const [showViewAll, setShowViewAll] = useState(false);
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/projects');
-        setApiProjects(response.data.slice(0, 3)); // Display only top 3 projects
+        setApiProjects(response.data); 
+        setShowViewAll(response.data.length > 6);
       } catch (error) {
         console.error('Error fetching projects:', error);
       }
@@ -186,14 +188,12 @@ const HomePage = () => {
               <h2 className="text-blue-600 font-bold tracking-wider uppercase text-sm mb-2">Our Portfolio</h2>
               <h3 className="text-3xl md:text-4xl font-bold text-slate-900">Recent Innovations</h3>
             </div>
-            <Link to="/projects" className="hidden md:flex items-center text-blue-600 font-semibold hover:text-blue-800 transition">
-              View All Projects <ArrowRight size={20} className="ml-2" />
-            </Link>
+            
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {apiProjects.length > 0 ? (
-              apiProjects.map((project) => (
+              apiProjects.slice(0, 6).map((project) => (
                 <ProjectCard key={project._id} project={project} />
               ))
             ) : (
@@ -201,11 +201,14 @@ const HomePage = () => {
             )}
           </div>
           
-          <div className="mt-12 text-center md:hidden">
-            <Link to="/projects" className="bg-slate-100 text-slate-900 px-6 py-3 rounded-lg font-bold w-full inline-block">
-              View All Projects
-            </Link>
-          </div>
+          {showViewAll && (
+            <div className="mt-12 text-center">
+              <Link to="/projects" className="bg-slate-100 text-slate-900 px-6 py-3 rounded-lg font-bold inline-flex items-center hover:bg-slate-200 transition">
+                View All Projects <ArrowRight size={20} className="ml-2" />
+              </Link>
+            </div>
+          )}
+          
         </div>
       </section>
 
