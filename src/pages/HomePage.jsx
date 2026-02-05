@@ -6,12 +6,13 @@ import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
 import { 
   CheckCircle, ArrowRight, Phone, Mail, MapPin, 
-  ChevronLeft, ChevronRight, Zap 
+  ChevronLeft, ChevronRight, Zap, Award, Users, Target, TrendingUp, Plus, Minus
 } from 'lucide-react';
 
 const HomePage = () => {
   const [apiProjects, setApiProjects] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [expandedFaq, setExpandedFaq] = useState(0);
 
   // Hero Slider Images (Placeholders)
   const slides = [
@@ -49,6 +50,10 @@ const HomePage = () => {
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
   const prevSlide = () => setCurrentSlide((prev) => (prev === 0 ? slides.length - 1 : prev - 1));
+
+  const toggleFaq = (index) => {
+    setExpandedFaq(expandedFaq === index ? null : index);
+  };
 
   return (
     <div className="font-sans text-slate-200 bg-zinc-950 min-h-screen">
@@ -115,45 +120,114 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ================= WHY CHOOSE US ================= */}
-      <section id="why-us" className="py-24 bg-zinc-950 border-y border-zinc-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-           <div className="text-center mb-16">
-              <h2 className="text-yellow-500 font-bold tracking-widest uppercase mb-3 text-sm">Core Strengths</h2>
-              <h3 className="text-4xl md:text-5xl font-black text-white italic tracking-tighter uppercase">Why Choose Us</h3>
+      {/* ================= WHY CHOOSE US - NEW DESIGN ================= */}
+      <section id="why-us" className="py-24 bg-zinc-950 border-y border-zinc-900 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'radial-gradient(circle at 2px 2px, rgb(234, 179, 8) 1px, transparent 0)',
+            backgroundSize: '40px 40px'
+          }}></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+           <div className="text-center mb-20">
+              <div className="inline-block mb-4 px-6 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-full">
+                <span className="text-yellow-500 font-bold tracking-widest uppercase text-sm">Our Competitive Edge</span>
+              </div>
+              <h3 className="text-5xl md:text-6xl font-black text-white mb-4">
+                Why Partner With Us
+              </h3>
+              <div className="w-24 h-1 bg-yellow-500 mx-auto"></div>
            </div>
 
-           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
-                { title: "Experience", subtitle: "10+ Years", icon: <CheckCircle /> },
-                { title: "Solutions", subtitle: "End-to-End", icon: <Zap /> },
-                { title: "Quality", subtitle: "Industrial Grade", icon: <CheckCircle /> },
-                { title: "Cost", subtitle: "Optimized", icon: <Zap /> },
-                { title: "Reach", subtitle: "Global Clients", icon: <CheckCircle /> },
+                { 
+                  title: "Decade of Excellence", 
+                  subtitle: "10+ Years Experience", 
+                  icon: <Award />,
+                  description: "Proven track record in delivering innovative electronic solutions across diverse industries."
+                },
+                { 
+                  title: "End-to-End Solutions", 
+                  subtitle: "Complete Integration", 
+                  icon: <Zap />,
+                  description: "From initial concept to final installation, we handle every aspect of your project seamlessly."
+                },
+                { 
+                  title: "Industrial Grade Quality", 
+                  subtitle: "Premium Standards", 
+                  icon: <Target />,
+                  description: "Rigorous quality control ensures every product meets international certification standards."
+                },
+                { 
+                  title: "Global Clientele", 
+                  subtitle: "Worldwide Trust", 
+                  icon: <Users />,
+                  description: "Successfully serving clients across continents with localized support and global expertise."
+                },
               ].map((item, index) => (
-                <div key={index} className="group relative bg-zinc-900/50 border-t border-b border-zinc-800 p-8 flex flex-col items-center justify-between text-center transition-all duration-300 hover:bg-zinc-900 hover:border-yellow-500/30">
+                <div 
+                  key={index} 
+                  className="group relative bg-linear-to-br from-zinc-900 to-zinc-950 border border-zinc-800 p-8 overflow-hidden transition-all duration-500 hover:border-yellow-500/50 hover:shadow-2xl hover:shadow-yellow-500/10"
+                >
+                   {/* Animated Background Gradient */}
+                   <div className="absolute inset-0 bg-linear-to-br from-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/5 group-hover:to-yellow-500/10 transition-all duration-500"></div>
                    
-                   {/* Tech Corners */}
-                   <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-zinc-700 group-hover:border-yellow-500 transition-colors"></div>
-                   <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-zinc-700 group-hover:border-yellow-500 transition-colors"></div>
-
-                   {/* Number Watermark */}
-                   <span className="absolute top-2 right-4 text-4xl font-black text-zinc-900 group-hover:text-yellow-500/10 transition-colors select-none">
-                     0{index + 1}
-                   </span>
+                   {/* Corner Accent */}
+                   <div className="absolute top-0 right-0 w-20 h-20 bg-yellow-500/5 transform rotate-45 translate-x-10 -translate-y-10 group-hover:bg-yellow-500/10 transition-all duration-500"></div>
                    
-                   <div className="mb-8 relative">
-                      <div className="text-zinc-500 group-hover:text-yellow-500 transition-colors duration-300 transform group-hover:scale-110">
-                        {React.cloneElement(item.icon, { size: 32, strokeWidth: 1 })}
+                   {/* Icon Container */}
+                   <div className="relative mb-6">
+                      <div className="w-16 h-16 bg-zinc-800 rounded-lg flex items-center justify-center group-hover:bg-yellow-500 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6">
+                        {React.cloneElement(item.icon, { 
+                          size: 32, 
+                          className: "text-yellow-500 group-hover:text-black transition-colors duration-500"
+                        })}
                       </div>
-                      <div className="absolute -inset-4 bg-yellow-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      {/* Glow Effect */}
+                      <div className="absolute inset-0 bg-yellow-500/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                    </div>
                    
-                   <div>
-                     <h4 className="text-white font-bold uppercase text-sm tracking-wider mb-1 group-hover:text-yellow-500 transition-colors">
-                       {item.subtitle}
+                   {/* Content */}
+                   <div className="relative">
+                     <h4 className="text-white font-black text-xl mb-2 group-hover:text-yellow-500 transition-colors duration-300">
+                       {item.title}
                      </h4>
+                     <p className="text-yellow-500 font-bold uppercase text-xs tracking-widest mb-4 opacity-80">
+                       {item.subtitle}
+                     </p>
+                     <p className="text-zinc-400 text-sm leading-relaxed group-hover:text-zinc-300 transition-colors duration-300">
+                       {item.description}
+                     </p>
                    </div>
+
+                   {/* Number Badge */}
+                   <div className="absolute bottom-4 right-4 w-12 h-12 rounded-full bg-zinc-800 group-hover:bg-yellow-500/20 border border-zinc-700 group-hover:border-yellow-500/50 flex items-center justify-center transition-all duration-500">
+                     <span className="text-2xl font-black text-zinc-700 group-hover:text-yellow-500 transition-colors duration-500">
+                       0{index + 1}
+                     </span>
+                   </div>
+                </div>
+              ))}
+           </div>
+
+           {/* Stats Bar */}
+           <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8">
+              {[
+                { number: "500+", label: "Projects Completed" },
+                { number: "98%", label: "Client Satisfaction" },
+                { number: "50+", label: "Industry Partners" },
+                { number: "24/7", label: "Support Available" }
+              ].map((stat, i) => (
+                <div key={i} className="text-center group">
+                  <div className="text-4xl md:text-5xl font-black text-yellow-500 mb-2 group-hover:scale-110 transition-transform duration-300">
+                    {stat.number}
+                  </div>
+                  <div className="text-zinc-400 text-sm uppercase tracking-widest">
+                    {stat.label}
+                  </div>
                 </div>
               ))}
            </div>
@@ -207,53 +281,119 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* ================= FAQ & WHY CHOOSE US (Image 2 Style) ================= */}
+      {/* ================= FAQ & WHY CHOOSE US - REDESIGNED ================= */}
       <section id="faq" className="py-24 bg-zinc-900 border-t border-zinc-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
            <div className="flex flex-col lg:flex-row gap-16">
               
               {/* Left: Accordion */}
               <div className="flex-1">
-                 <div className="bg-yellow-500 text-black font-bold uppercase tracking-widest text-xs inline-block px-2 py-1 mb-4">Explore FAQ's</div>
-                 <h2 className="text-4xl md:text-5xl font-black text-white uppercase italic leading-tight mb-12">
-                   Popular questions <br/> about our company
+                 <div className="inline-block mb-4 px-6 py-2 bg-yellow-500 text-black font-bold uppercase tracking-widest text-xs rounded">
+                   Explore FAQ's
+                 </div>
+                 <h2 className="text-4xl md:text-5xl font-black text-white mb-4 leading-tight">
+                   Frequently Asked <br/> 
+                   <span className="text-yellow-500">Questions</span>
                  </h2>
+                 <p className="text-zinc-400 mb-10 text-lg">
+                   Find answers to common queries about our services, processes, and support.
+                 </p>
 
                  <div className="space-y-4">
                     {[
-                      { q: "Why to choose us?", a: "Whether you need lighting repairs, electrical upgrades, or a new installation, we're here to provide quality services that meet your needs and exceed your expectations." },
-                      { q: "How quickly can you get help?", a: "Our emergency response team is available 24/7 with a guaranteed 2-hour onsite arrival time for critical failures." },
-                      { q: "How to pay for services?", a: "We accept all credit cards, bank transfers, and offer flexible financing plans for large-scale industrial projects." },
-                      { q: "What to call an electrician?", a: "Call us anytime at +94 76 537 6106 for immediate assistance or consultation." }
+                      { 
+                        q: "Why should I choose your company?", 
+                        a: "With over 10 years of industry experience, we deliver end-to-end electronic solutions from concept to installation. Our industrial-grade quality, cost optimization, and global client base set us apart. We provide 24/7 support and maintain a 98% client satisfaction rate." 
+                      },
+                      { 
+                        q: "How quickly can I get technical support?", 
+                        a: "Our emergency response team operates 24/7 with a guaranteed 2-hour onsite arrival time for critical system failures. For standard inquiries, we respond within 30 minutes during business hours and provide remote diagnostics immediately." 
+                      },
+                      { 
+                        q: "What payment methods do you accept?", 
+                        a: "We accept all major credit cards, bank transfers, PayPal, and offer flexible financing options for large-scale industrial projects. Custom payment plans can be arranged for enterprise clients with NET-30 or NET-60 terms." 
+                      },
+                      { 
+                        q: "Do you provide warranties on your products?", 
+                        a: "Yes, all our products come with a comprehensive 2-year manufacturer warranty covering parts and labor. Extended warranty options up to 5 years are available. We also offer preventive maintenance contracts to ensure optimal performance." 
+                      },
+                      { 
+                        q: "Can you handle international projects?", 
+                        a: "Absolutely! We serve clients across multiple continents with localized support teams. We handle all aspects of international shipping, customs clearance, and provide on-ground installation support through our global partner network." 
+                      },
+                      { 
+                        q: "What industries do you specialize in?", 
+                        a: "We specialize in manufacturing, healthcare, telecommunications, renewable energy, and smart building automation. Our solutions are customized for each industry's unique requirements, meeting all relevant regulatory standards and certifications." 
+                      }
                     ].map((faq, i) => (
-                      <div key={i} className="bg-zinc-950 border border-zinc-800">
-                        <button className="w-full flex justify-between items-center p-6 text-left hover:bg-zinc-900 transition-colors group">
-                           <span className="text-lg font-bold text-white group-hover:text-yellow-500 transition-colors">{faq.q}</span>
-                           <div className="bg-yellow-500 text-black p-1">
-                             <CheckCircle size={16} className="rotate-45" /> 
+                      <div 
+                        key={i} 
+                        className="bg-zinc-950 border border-zinc-800 hover:border-yellow-500/30 transition-all duration-300 overflow-hidden"
+                      >
+                        <button 
+                          onClick={() => toggleFaq(i)}
+                          className="w-full flex justify-between items-center p-6 text-left group"
+                        >
+                           <span className="text-lg font-bold text-white group-hover:text-yellow-500 transition-colors pr-4">
+                             {faq.q}
+                           </span>
+                           <div className={`shrink-0 w-10 h-10 bg-yellow-500 flex items-center justify-center transition-transform duration-300 ${expandedFaq === i ? 'rotate-180' : ''}`}>
+                             {expandedFaq === i ? (
+                               <Minus size={20} className="text-black" />
+                             ) : (
+                               <Plus size={20} className="text-black" />
+                             )}
                            </div>
                         </button>
-                        {i === 0 && ( 
-                          <div className="p-6 pt-0 text-zinc-400 text-sm leading-relaxed border-t border-zinc-900">
+                        <div 
+                          className={`transition-all duration-500 ease-in-out ${
+                            expandedFaq === i 
+                              ? 'max-h-96 opacity-100' 
+                              : 'max-h-0 opacity-0'
+                          } overflow-hidden`}
+                        >
+                          <div className="p-6 pt-0 text-zinc-400 leading-relaxed border-t border-zinc-900">
                              {faq.a}
                           </div>
-                        )}
+                        </div>
                       </div>
                     ))}
                  </div>
                  
-                 <button className="mt-8 bg-yellow-500 text-black px-8 py-3 font-bold uppercase tracking-widest hover:bg-yellow-400 transition shadow-lg flex items-center gap-2">
-                   + All Questions
+                 <button className="mt-8 bg-yellow-500 text-black px-8 py-4 font-bold uppercase tracking-widest hover:bg-yellow-400 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-3 group">
+                   View All Questions
+                   <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform duration-300" />
                  </button>
               </div>
 
               {/* Right: Images Grid */}
               <div className="flex-1 relative hidden lg:block">
-                 <div className="aspect-4/5 bg-yellow-500 absolute top-0 right-0 w-2/3 z-0"></div>
+                 <div className="aspect-4/5 bg-linear-to-br from-yellow-500 to-yellow-600 absolute top-0 right-0 w-2/3 z-0 opacity-20"></div>
                  <div className="relative z-10 grid grid-cols-2 gap-4 pt-12 pr-8">
-                    <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=2069&auto=format&fit=crop" className="w-full h-64 object-cover border-4 border-zinc-950 shadow-2xl" alt="Worker" />
-                    <img src="https://images.unsplash.com/photo-1558449028-b53a39d100fc?q=80&w=1974&auto=format&fit=crop" className="w-full h-64 object-cover border-4 border-zinc-950 shadow-2xl mt-12" alt="Switch" />
-                    <img src="https://images.unsplash.com/photo-1544724569-5f546fd6f2b5?q=80&w=1974&auto=format&fit=crop" className="w-full h-64 object-cover border-4 border-zinc-950 shadow-2xl col-span-2" alt="Lighting" />
+                    <div className="relative overflow-hidden group">
+                      <img 
+                        src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=2069&auto=format&fit=crop" 
+                        className="w-full h-64 object-cover border-4 border-zinc-950 shadow-2xl transition-transform duration-500 group-hover:scale-110" 
+                        alt="Worker" 
+                      />
+                      <div className="absolute inset-0 bg-yellow-500/0 group-hover:bg-yellow-500/10 transition-all duration-500"></div>
+                    </div>
+                    <div className="relative overflow-hidden group">
+                      <img 
+                        src="https://images.unsplash.com/photo-1558449028-b53a39d100fc?q=80&w=1974&auto=format&fit=crop" 
+                        className="w-full h-64 object-cover border-4 border-zinc-950 shadow-2xl mt-12 transition-transform duration-500 group-hover:scale-110" 
+                        alt="Switch" 
+                      />
+                      <div className="absolute inset-0 bg-yellow-500/0 group-hover:bg-yellow-500/10 transition-all duration-500"></div>
+                    </div>
+                    <div className="relative overflow-hidden group col-span-2">
+                      <img 
+                        src="https://images.unsplash.com/photo-1544724569-5f546fd6f2b5?q=80&w=1974&auto=format&fit=crop" 
+                        className="w-full h-64 object-cover border-4 border-zinc-950 shadow-2xl transition-transform duration-500 group-hover:scale-110" 
+                        alt="Lighting" 
+                      />
+                      <div className="absolute inset-0 bg-yellow-500/0 group-hover:bg-yellow-500/10 transition-all duration-500"></div>
+                    </div>
                  </div>
               </div>
 
