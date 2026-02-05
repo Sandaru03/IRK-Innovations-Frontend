@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import ServicesPage from "./pages/ServicesPage";
-import ProjectOverview from "./pages/ProjectOverview";
+import ProjectsPage from "./pages/ProjectsPage";
 import ProjectDetails from "./pages/ProjectDetails";
 import ContactPage from "./pages/ContactPage";
 import AdminLogin from "./pages/AdminLogin";
@@ -18,7 +18,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/services" element={<ServicesPage />} />
-        <Route path="/projects" element={<ProjectOverview />} />
+        <Route path="/projects" element={<ProjectsPage />} />
         <Route path="/projects/:id" element={<ProjectDetails />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/adminlogin" element={<AdminLogin />} />
@@ -31,4 +31,4 @@ function App() {
   )
 }
 
-export default App
+export default App;
