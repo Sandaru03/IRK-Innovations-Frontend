@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, CheckCircle, Zap } from 'lucide-react';
+import { Menu, X, CheckCircle, Zap, Phone } from 'lucide-react';
 
 const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,23 +21,26 @@ const NavBar = () => {
           </Link>
 
           <div className="hidden md:flex items-center space-x-8">
-            {['Home', 'Services', 'Projects'].map((item) => (
-              <a key={item} href={`/#${item.toLowerCase()}`} className="text-sm font-bold uppercase tracking-widest text-zinc-400 hover:text-yellow-500 transition-colors">
-                {item}
-              </a>
-            ))}
+            <Link to="/" className="text-sm font-bold uppercase tracking-widest text-zinc-400 hover:text-yellow-500 transition-colors">
+              Home
+            </Link>
+            <Link to="/about" className="text-sm font-bold uppercase tracking-widest text-zinc-400 hover:text-yellow-500 transition-colors">
+              About
+            </Link>
+            <Link to="/services" className="text-sm font-bold uppercase tracking-widest text-zinc-400 hover:text-yellow-500 transition-colors">
+              Services
+            </Link>
+            <Link to="/projects" className="text-sm font-bold uppercase tracking-widest text-zinc-400 hover:text-yellow-500 transition-colors">
+              Projects
+            </Link>
             <Link to="/contact" className="text-sm font-bold uppercase tracking-widest text-zinc-400 hover:text-yellow-500 transition-colors">
                Contact
             </Link>
           </div>
 
           <div className="hidden md:flex items-center gap-6">
-             <div className="text-zinc-300 font-bold text-sm">
-                <span className="text-yellow-500 mr-2">📞</span>
-                +94 76 537 6106
-             </div>
-             <button className="border border-yellow-500/50 text-yellow-500 hover:bg-yellow-500 hover:text-black px-6 py-2 uppercase font-bold text-sm tracking-wider transition-all duration-300">
-               Get Quote
+             <button className="flex items-center gap-2 border border-yellow-500/50 text-yellow-500 hover:bg-yellow-500 hover:text-black px-6 py-2 uppercase font-bold text-sm tracking-wider transition-all duration-300">
+               <Phone size={18} /> +94 76 537 6106
              </button>
           </div>
 
@@ -52,11 +55,21 @@ const NavBar = () => {
       {isMenuOpen && (
         <div className="md:hidden bg-zinc-900 border-b border-yellow-500/20">
           <div className="px-4 pt-2 pb-6 space-y-1">
-            {['Home', 'Services', 'Projects', 'Contact'].map((item) => (
-              <a key={item} href={`#${item.toLowerCase()}`} className="block px-3 py-4 text-base font-bold text-zinc-300 hover:text-yellow-500 border-b border-zinc-800 uppercase tracking-wider">
-                {item}
-              </a>
-            ))}
+            <Link to="/" onClick={() => setIsMenuOpen(false)} className="block px-3 py-4 text-base font-bold text-zinc-300 hover:text-yellow-500 border-b border-zinc-800 uppercase tracking-wider">
+              Home
+            </Link>
+            <Link to="/about" onClick={() => setIsMenuOpen(false)} className="block px-3 py-4 text-base font-bold text-zinc-300 hover:text-yellow-500 border-b border-zinc-800 uppercase tracking-wider">
+              About
+            </Link>
+            <Link to="/services" onClick={() => setIsMenuOpen(false)} className="block px-3 py-4 text-base font-bold text-zinc-300 hover:text-yellow-500 border-b border-zinc-800 uppercase tracking-wider">
+              Services
+            </Link>
+            <Link to="/projects" onClick={() => setIsMenuOpen(false)} className="block px-3 py-4 text-base font-bold text-zinc-300 hover:text-yellow-500 border-b border-zinc-800 uppercase tracking-wider">
+              Projects
+            </Link>
+            <Link to="/contact" onClick={() => setIsMenuOpen(false)} className="block px-3 py-4 text-base font-bold text-zinc-300 hover:text-yellow-500 border-b border-zinc-800 uppercase tracking-wider">
+              Contact
+            </Link>
           </div>
         </div>
       )}
