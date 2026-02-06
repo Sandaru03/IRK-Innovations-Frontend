@@ -100,7 +100,7 @@ const HomePage = () => {
         subject: `Home Page Inquiry from ${formData.phone}`,
         message: formData.message
       };
-      const response = await axios.post('http://localhost:5000/api/contact', payload);
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/contact`, payload);
       toast.success(response.data.message || 'Message sent successfully!');
       setFormData({ name: '', email: '', phone: '', message: '' });
     } catch (error) {
@@ -189,7 +189,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/projects');
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/projects`);
         setApiProjects(response.data); 
       } catch (error) {
         console.error('Error fetching projects:', error);
