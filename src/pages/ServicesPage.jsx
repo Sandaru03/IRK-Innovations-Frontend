@@ -1,50 +1,53 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
 import { 
-  Cpu, 
-  Settings, 
-  Search, 
-  CheckCircle2, 
-  ArrowRight, 
-  Zap, 
-  Layers, 
-  Box,
-  Factory
+  Cpu, Settings, Search, CheckCircle2, ArrowRight, Zap, 
+  Layers, Box, Factory, ChevronRight, 
+  ShieldCheck, Globe, FlaskConical, PenTool
 } from 'lucide-react';
 
 const ServicesPage = () => {
-  // 1. Core Services based on the image
+  const [headerHeight, setHeaderHeight] = useState(0);
+
+  useEffect(() => {
+    // Header height eka measure karala margin eka hadanna
+    const header = document.querySelector('header');
+    if (header) setHeaderHeight(header.offsetHeight);
+    window.scrollTo(0, 0);
+  }, []);
+
   const mainServices = [
     {
       title: "End-to-End Customized Electronics",
-      description: "We need your problem only. We will give you the solution. From design to manufacturing and installation, we follow standard product development steps.",
-      icon: <Cpu className="w-10 h-10 text-yellow-500" />,
+      description: "We need your problem only — we will give you the solution. From design to manufacturing and installation, we follow standard industrial development steps.",
+      icon: <Cpu size={32} />,
+      image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800"
     },
     {
       title: "Electronics Engineering Consultation",
-      description: "10+ years of industry experience in Embedded products design and Manufacturing. Experts in architecture, testing, and optimization.",
-      icon: <Settings className="w-10 h-10 text-yellow-500" />,
+      description: "10+ years of industry experience in Embedded products design and Manufacturing. Experts in architecture, testing, and cost optimization.",
+      icon: <Settings size={32} />,
+      image: "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=800"
     },
     {
       title: "Tech Products Sourcing",
-      description: "Need to source specific tech products? We have established networks to source high-quality components and products directly from China.",
-      icon: <Search className="w-10 h-10 text-yellow-500" />,
+      description: "Need to source specific tech products? We have established networks to source high-quality components directly from China with QA.",
+      icon: <Search size={32} />,
+      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=800"
     }
   ];
 
-  // 2. Full Workflow Steps (Detailed)
   const fullWorkflow = [
-    { step: "Gather Information", detail: "Requirements collection" },
-    { step: "Proof of Concept", detail: "Prototype development" },
-    { step: "EVT", detail: "Engineering Validation (Circuit Finalize)" },
-    { step: "DVT", detail: "Design Validation (Mechanical Parts)" },
-    { step: "Molding", detail: "Plastic parts molding" },
-    { step: "PVT / Mini Bulk", detail: "Manufacturing process finalize" },
-    { step: "Bulk Production", detail: "Batch wise production" }
+    { step: "01", title: "Information gathering", detail: "Requirements collection" },
+    { step: "02", title: "Proof of Concept", detail: "Prototype development" },
+    { step: "03", title: "EVT", detail: "Engineering Validation" },
+    { step: "04", title: "DVT", detail: "Design Validation" },
+    { step: "05", title: "Molding", detail: "Plastic parts molding" },
+    { step: "06", title: "PVT / Mini Bulk", detail: "Process finalize" },
+    { step: "07", title: "Bulk Production", detail: "Mass production" }
   ];
 
-  // 3. Consultation Points
   const consultPoints = [
     "Electronics products architecture design",
     "Products testing",
@@ -57,109 +60,171 @@ const ServicesPage = () => {
   ];
 
   return (
-    <div className="bg-black min-h-screen text-white">
+    <div className="font-sans text-gray-800 bg-white min-h-screen">
       <NavBar />
-      
-      {/* Hero Header */}
-      <div className="pt-32 pb-16 px-4 text-center">
-        <h1 className="text-5xl md:text-7xl font-black tracking-tighter mb-6 uppercase">
-          Our <span className="text-yellow-500 underline decoration-white/10">Services</span>
-        </h1>
-        <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
-          Comprehensive electronics solutions from concept to mass production.
-        </p>
-      </div>
 
-      {/* Main Service Highlights */}
-      <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-6 mb-24">
-        {mainServices.map((s, i) => (
-          <div key={i} className="p-10 bg-zinc-900/50 border-2 border-zinc-800 hover:border-yellow-500 transition-all duration-500 group rounded-3xl">
-            <div className="bg-black w-20 h-20 flex items-center justify-center rounded-2xl mb-8 group-hover:rotate-12 transition-transform">
-              {s.icon}
-            </div>
-            <h3 className="text-2xl font-bold mb-4 leading-tight">{s.title}</h3>
-            <p className="text-zinc-400 leading-relaxed">{s.description}</p>
-          </div>
-        ))}
-      </div>
+      {/* ================= HERO SECTION ================= */}
+      <section className="relative pt-32 pb-20 bg-[#143d2d] overflow-hidden" style={{ marginTop: headerHeight }}>
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-yellow-400 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-4 relative z-10 text-center">
 
-      {/* Development Timeline (Modern Visual) */}
-      <div className="bg-zinc-900/30 py-24 border-y border-zinc-800">
+          <h1 className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight">
+            Comprehensive <span className="text-yellow-400">Electronics</span> <br/>
+            Engineering Services
+          </h1>
+          <p className="text-emerald-100 text-lg max-w-2xl mx-auto leading-relaxed">
+            From initial concept to mass production, we provide end-to-end solutions 
+            tailored to solve your most complex technical challenges.
+          </p>
+        </div>
+      </section>
+
+      {/* ================= MAIN SERVICES GRID ================= */}
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-12 flex items-center gap-3">
-            <Zap className="text-yellow-500" /> Standard Product Development Steps
-          </h2>
-          
-          <div className="relative overflow-x-auto pb-8">
-            <div className="flex flex-now-with gap-4 min-w-[1200px]">
-              {fullWorkflow.map((item, index) => (
-                <div key={index} className="flex-1">
-                  <div className="bg-zinc-800 p-6 rounded-2xl border border-zinc-700 h-full relative group hover:bg-yellow-500 transition-colors duration-300">
-                    <span className="text-yellow-500 font-mono text-sm mb-4 block group-hover:text-black">STEP 0{index + 1}</span>
-                    <h4 className="font-bold text-lg mb-2 group-hover:text-black">{item.step}</h4>
-                    <p className="text-xs text-zinc-400 group-hover:text-black/80">{item.detail}</p>
-                    {index !== fullWorkflow.length - 1 && (
-                      <ArrowRight className="absolute -right-3 top-1/2 -translate-y-1/2 text-zinc-600 hidden lg:block" size={24} />
-                    )}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {mainServices.map((service, i) => (
+              <div key={i} className="group bg-gray-50 rounded-[32px] overflow-hidden border border-gray-100 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+                <div className="h-48 overflow-hidden relative">
+                  <img src={service.image} alt={service.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                  <div className="absolute inset-0 bg-emerald-900/40 group-hover:bg-emerald-900/20 transition-colors"></div>
+                  <div className="absolute top-4 left-4 bg-yellow-400 p-3 rounded-2xl shadow-lg text-emerald-900">
+                    {service.icon}
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-          <div className="mt-8 p-6 border-l-4 border-yellow-500 bg-zinc-900/80 rounded-r-xl">
-            <p className="text-sm text-zinc-300">
-              <span className="text-yellow-500 font-bold uppercase mr-2">Quick Note:</span> 
-              If the product doesn't need customized enclosures, the project is simplified: 
-              <span className="text-white italic ml-1">Gathering → Prototype → EVT → Mini Bulk → Bulk Production.</span>
-            </p>
+                <div className="p-8">
+                  <h3 className="text-2xl font-black text-gray-900 mb-4 leading-tight">{service.title}</h3>
+                  <p className="text-gray-600 leading-relaxed mb-6">{service.description}</p>
+                  <button className="flex items-center gap-2 text-emerald-700 font-bold hover:gap-4 transition-all">
+                    Learn More <ArrowRight size={20} />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Consultancy Section */}
-      <div className="max-w-7xl mx-auto px-4 py-24">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div className="space-y-8">
-            <h2 className="text-4xl font-bold italic leading-none">
-              Expert <span className="text-yellow-500">Consultation</span> Services
-            </h2>
-            <p className="text-zinc-400 text-lg leading-relaxed">
-              With over 10 years in the industry, we provide technical advisory across the entire production lifecycle.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {consultPoints.map((point, i) => (
-                <div key={i} className="flex items-center gap-3 p-4 bg-zinc-900/40 rounded-xl border border-zinc-800 hover:bg-zinc-800 transition-colors">
-                  <CheckCircle2 className="text-yellow-500 shrink-0" size={18} />
-                  <span className="text-sm font-medium text-zinc-200">{point}</span>
+      {/* ================= WORKFLOW SECTION ================= */}
+      <section className="py-24 bg-gray-50 border-y border-gray-200">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">Product Development Lifecycle</h2>
+            <div className="w-24 h-1 bg-yellow-400 mx-auto rounded-full"></div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
+            {fullWorkflow.map((item, index) => (
+              <div key={index} className="relative group">
+                <div className="bg-white p-6 rounded-2xl border border-gray-200 h-full shadow-sm group-hover:border-emerald-500 group-hover:shadow-md transition-all text-center">
+                  <span className="text-4xl font-black text-gray-100 group-hover:text-emerald-50 transition-colors block mb-2">{item.step}</span>
+                  <h4 className="font-bold text-gray-900 mb-2 text-sm uppercase tracking-tight">{item.title}</h4>
+                  <p className="text-xs text-gray-500">{item.detail}</p>
                 </div>
-              ))}
+                {index < fullWorkflow.length - 1 && (
+                  <div className="hidden xl:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 text-gray-300">
+                    <ChevronRight size={24} />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 bg-emerald-900 rounded-[2rem] p-8 text-white flex flex-col md:flex-row items-center gap-6 shadow-2xl">
+
+            <div>
+              <h4 className="text-xl font-bold mb-2">Efficiency Note:</h4>
+              <p className="text-emerald-100 opacity-90">
+                If the product does not require customized enclosures, we simplify the process by moving directly from 
+                <span className="font-bold text-yellow-400 px-2 uppercase">Prototyping</span> to 
+                <span className="font-bold text-yellow-400 px-2 uppercase">Mini Bulk</span>, saving you significant time and cost.
+              </p>
             </div>
           </div>
-          
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-linear-to-r from-yellow-500 to-orange-500 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
-            <div className="relative bg-zinc-900 p-12 rounded-3xl border border-zinc-800">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 bg-yellow-500 rounded-lg">
-                  <Factory className="text-black" />
-                </div>
-                <h3 className="text-2xl font-bold">China Sourcing</h3>
+        </div>
+      </section>
+
+      {/* ================= CONSULTATION & SOURCING ================= */}
+      <section className="py-24 bg-white overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            
+            {/* Consultation Points */}
+            <div className="relative">
+              <div className="absolute -top-10 -left-10 w-32 h-32 bg-yellow-400/10 rounded-full blur-3xl"></div>
+              <h2 className="text-4xl font-black text-gray-900 mb-8 leading-tight">
+                Expert <span className="text-emerald-700">Engineering</span><br/>Consultancy
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {consultPoints.map((point, i) => (
+                  <div key={i} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-emerald-200 hover:bg-white hover:shadow-lg transition-all">
+                    <div className="bg-emerald-100 p-1 rounded-full text-emerald-700">
+                      <CheckCircle2 size={16} />
+                    </div>
+                    <span className="text-sm font-bold text-gray-700">{point}</span>
+                  </div>
+                ))}
               </div>
-              <p className="text-zinc-400 mb-8">
-                We bridge the gap between you and the world's largest manufacturing hub. Get quality tech products at the best prices.
-              </p>
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-center gap-2 text-sm text-zinc-300">• Component Quality Verification</li>
-                <li className="flex items-center gap-2 text-sm text-zinc-300">• Direct Factory Communication</li>
-                <li className="flex items-center gap-2 text-sm text-zinc-300">• Global Shipping Logistics</li>
-              </ul>
-              <button className="w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-yellow-500 transition-all active:scale-95">
-                Contact for Sourcing
+            </div>
+
+            {/* Sourcing Card */}
+            <div className="relative">
+              <div className="bg-[#143d2d] rounded-[40px] p-10 text-white relative overflow-hidden shadow-2xl">
+                <Globe className="absolute -right-20 -bottom-20 text-white opacity-5" size={400} />
+                <div className="relative z-10">
+                  <div className="bg-yellow-400 w-16 h-16 rounded-2xl flex items-center justify-center text-emerald-950 mb-8 shadow-xl shadow-yellow-400/20">
+                    <Factory size={32} />
+                  </div>
+                  <h3 className="text-3xl font-black mb-6">Global Tech Sourcing</h3>
+                  <p className="text-emerald-100 mb-8 text-lg leading-relaxed">
+                    Leverage our established factory networks in China. We handle the technical verification, 
+                    quality audits, and logistics so you get the best products at factory prices.
+                  </p>
+                  <ul className="space-y-4 mb-10">
+                    {[
+                      { icon: <ShieldCheck className="text-yellow-400" />, text: "Strict Component Quality Verification" },
+                      { icon: <PenTool className="text-yellow-400" />, text: "Direct Technical Communication with Factories" },
+                      { icon: <Box className="text-yellow-400" />, text: "Reliable Shipping & Logistics Management" }
+                    ].map((li, i) => (
+                      <li key={i} className="flex items-center gap-3 font-medium">
+                        {li.icon} {li.text}
+                      </li>
+                    ))}
+                  </ul>
+                  <button className="w-full bg-yellow-400 text-emerald-950 font-black py-5 rounded-2xl hover:bg-white hover:scale-[1.02] transition-all flex items-center justify-center gap-3">
+                    Start Sourcing Today <ArrowRight size={20} />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* ================= CALL TO ACTION ================= */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="bg-emerald-900 rounded-[3rem] p-12 text-center relative overflow-hidden isolate">
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 -z-10"></div>
+            <h2 className="text-3xl md:text-5xl font-black text-white mb-6">Have a technical problem?</h2>
+            <p className="text-emerald-100 text-xl mb-10 max-w-2xl mx-auto opacity-80">
+              Consult with our engineering team today and let's build your next innovation together.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button className="bg-yellow-400 text-emerald-950 px-10 py-5 rounded-2xl font-black text-lg hover:bg-white transition-all shadow-xl">
+                Get a Free Consultation
+              </button>
+              <button className="bg-transparent border-2 border-white/30 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-white/10 transition-all">
+                View Our Projects
               </button>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       <Footer />
     </div>
