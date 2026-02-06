@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Send, Phone, Mail, MapPin, Clock } from 'lucide-react';
+import { Send, Phone, Mail, MapPin, Clock, ArrowRight, MessageSquare } from 'lucide-react';
 import { toast } from 'react-toastify';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
@@ -13,6 +13,13 @@ const ContactPage = () => {
     message: ''
   });
   const [loading, setLoading] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(0);
+
+  useEffect(() => {
+    const header = document.querySelector('header');
+    if (header) setHeaderHeight(header.offsetHeight);
+    window.scrollTo(0, 0);
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -32,117 +39,148 @@ const ContactPage = () => {
     }
   };
 
+  const contactInfo = [
+    { 
+      icon: <Phone size={24} />, 
+      title: "Call Us", 
+      content: "+94 76 537 6106", 
+      sub: "Mon-Fri 9am-6pm",
+      link: "tel:+94765376106" 
+    },
+    { 
+      icon: <Mail size={24} />, 
+      title: "Email Us", 
+      content: "info@volteng.com", 
+      sub: "Online support 24/7",
+      link: "mailto:info@volteng.com" 
+    },
+    { 
+      icon: <MapPin size={24} />, 
+      title: "Visit Us", 
+      content: "No. 123, Innovation Drive", 
+      sub: "Colombo, Sri Lanka",
+      link: "#" 
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-zinc-950 font-sans text-zinc-300">
+    <div className="min-h-screen bg-white font-sans text-gray-800">
       <NavBar />
       
-      {/* Header */}
-      <div className="relative py-20 bg-zinc-900 overflow-hidden border-b border-zinc-800">
-         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            <h1 className="text-4xl md:text-6xl font-black text-white uppercase italic tracking-tighter mb-4">
-               Get In <span className="text-yellow-500">Touch</span>
-            </h1>
-            <p className="text-lg text-zinc-400 max-w-2xl mx-auto">
-              Our engineering team is ready to assist you.
-            </p>
-         </div>
-      </div>
+      {/* ================= HERO SECTION ================= */}
+      <section className="relative pt-32 pb-20 bg-[#143d2d] overflow-hidden" style={{ marginTop: headerHeight }}>
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-yellow-400 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
+        </div>
+        
+        <div className="max-w-7xl mx-auto px-4 relative z-10 text-center">
+          <h1 className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight">
+            Get In <span className="text-yellow-400">Touch</span>
+          </h1>
+          <p className="text-emerald-100 text-lg max-w-2xl mx-auto leading-relaxed">
+            Have a project in mind or need technical consultation? Our engineering team is ready to help you innovate.
+          </p>
+        </div>
+      </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+      <div className="max-w-7xl mx-auto px-4 py-24">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
           
-          {/* Info Section */}
-          <div className="space-y-12">
+          {/* INFO SIDEBAR (4 Columns) */}
+          <div className="lg:col-span-5 space-y-8">
             <div>
-               <h2 className="text-2xl font-bold text-white uppercase tracking-wider mb-6">Contact Information</h2>
-               <div className="space-y-8">
-                  {[
-                     { icon: Phone, title: "Phone", content: "+94 76 537 6106", sub: "Mon-Fri 9am-6pm" },
-                     { icon: Mail, title: "Email", content: "info@volteng.com", sub: "Online support 24/7" },
-                     { icon: MapPin, title: "Office", content: "No. 123, Innovation Drive", sub: "Colombo, Sri Lanka" }
-                  ].map((item, i) => (
-                     <div key={i} className="flex gap-6 group">
-                        <div className="bg-zinc-900 p-4 border border-zinc-800 group-hover:border-yellow-500 transition-colors">
-                           <item.icon className="text-yellow-500" size={24} />
-                        </div>
-                        <div>
-                           <h3 className="text-white font-bold text-lg">{item.title}</h3>
-                           <p className="text-zinc-300 text-lg font-medium">{item.content}</p>
-                           <p className="text-zinc-500 text-sm">{item.sub}</p>
-                        </div>
-                     </div>
-                  ))}
-               </div>
+              <h2 className="text-3xl font-black text-gray-900 mb-6">Contact Information</h2>
+              <p className="text-gray-600 mb-10">Reach out to us through any of these channels. We typically respond within 24 hours.</p>
             </div>
 
-            <div className="bg-yellow-500 p-8 text-black relative overflow-hidden">
-               <div className="relative z-10">
-                 <h3 className="text-3xl font-black uppercase italic mb-4">Urgent Inquiry?</h3>
-                 <p className="font-bold mb-6 text-lg border-b border-black/20 pb-6">Skip the form and call our direct engineering hotline.</p>
-                 <a href="tel:+94765376106" className="inline-flex items-center gap-2 bg-black text-white px-8 py-4 font-bold uppercase tracking-widest hover:scale-105 transition-transform">
-                    <Phone size={20} /> Call Now
-                 </a>
-               </div>
-               <div className="absolute top-0 right-0 opacity-10 transform translate-x-1/3 -translate-y-1/3">
-                  <Phone size={300} />
-               </div>
+            <div className="space-y-6">
+              {contactInfo.map((item, i) => (
+                <a href={item.link} key={i} className="flex gap-6 p-6 bg-gray-50 rounded-[2rem] border border-gray-100 hover:border-emerald-200 hover:bg-white hover:shadow-xl transition-all group">
+                  <div className="bg-emerald-900 text-yellow-400 p-4 rounded-2xl shadow-lg group-hover:scale-110 transition-transform">
+                    {item.icon}
+                  </div>
+                  <div>
+                    <h3 className="text-gray-900 font-black text-lg uppercase tracking-tight">{item.title}</h3>
+                    <p className="text-emerald-700 text-lg font-bold">{item.content}</p>
+                    <p className="text-gray-500 text-sm">{item.sub}</p>
+                  </div>
+                </a>
+              ))}
+            </div>
+
+            {/* URGENT CARD */}
+            <div className="bg-yellow-400 rounded-[2.5rem] p-8 mt-12 relative overflow-hidden shadow-2xl shadow-yellow-400/20">
+              <div className="relative z-10">
+                <h3 className="text-2xl font-black text-emerald-950 mb-2 italic uppercase">Urgent Inquiry?</h3>
+                <p className="text-emerald-900 font-bold mb-6">Skip the form and call our engineering hotline.</p>
+                <a href="tel:+94765376106" className="inline-flex items-center gap-3 bg-emerald-950 text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-black transition-colors">
+                  <Phone size={20} /> Call Now
+                </a>
+              </div>
+              <Phone size={200} className="absolute -right-10 -bottom-10 text-emerald-950 opacity-5 rotate-12" />
             </div>
           </div>
 
-          {/* Form Section */}
-          <div className="bg-zinc-900 border border-zinc-800 p-8 lg:p-12 relative">
-             <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-yellow-500 to-transparent"></div>
-             <h2 className="text-2xl font-bold text-white uppercase tracking-wider mb-8">Send us a Message</h2>
-             
-             <form onSubmit={handleSubmit} className="space-y-6">
+          {/* FORM SECTION (7 Columns) */}
+          <div className="lg:col-span-7">
+            <div className="bg-white rounded-[3rem] p-8 md:p-12 shadow-2xl border border-gray-100 relative">
+              <div className="flex items-center gap-4 mb-10">
+                <div className="bg-emerald-100 p-3 rounded-xl text-emerald-700">
+                  <MessageSquare size={28} />
+                </div>
+                <h2 className="text-3xl font-black text-gray-900">Send a Message</h2>
+              </div>
+              
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   <div>
-                      <label className="block text-xs font-bold text-yellow-500 uppercase tracking-widest mb-2">Name</label>
-                      <input 
-                         type="text" name="name" value={formData.name} onChange={handleChange} required
-                         className="w-full bg-zinc-950 border border-zinc-800 text-white px-4 py-3 focus:border-yellow-500 focus:outline-none transition-colors"
-                         placeholder="Your Name"
-                      />
-                   </div>
-                   <div>
-                      <label className="block text-xs font-bold text-yellow-500 uppercase tracking-widest mb-2">Email</label>
-                      <input 
-                         type="email" name="email" value={formData.email} onChange={handleChange} required
-                         className="w-full bg-zinc-950 border border-zinc-800 text-white px-4 py-3 focus:border-yellow-500 focus:outline-none transition-colors"
-                         placeholder="email@example.com"
-                      />
-                   </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-black text-emerald-900 uppercase tracking-widest ml-1">Name</label>
+                    <input 
+                      type="text" name="name" value={formData.name} onChange={handleChange} required
+                      className="w-full bg-gray-50 border-2 border-transparent focus:border-yellow-400 focus:bg-white rounded-2xl px-6 py-4 outline-none transition-all text-gray-900 font-medium"
+                      placeholder="Your Full Name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-black text-emerald-900 uppercase tracking-widest ml-1">Email</label>
+                    <input 
+                      type="email" name="email" value={formData.email} onChange={handleChange} required
+                      className="w-full bg-gray-50 border-2 border-transparent focus:border-yellow-400 focus:bg-white rounded-2xl px-6 py-4 outline-none transition-all text-gray-900 font-medium"
+                      placeholder="email@example.com"
+                    />
+                  </div>
                 </div>
 
-                <div>
-                   <label className="block text-xs font-bold text-yellow-500 uppercase tracking-widest mb-2">Subject</label>
-                   <input 
-                      type="text" name="subject" value={formData.subject} onChange={handleChange} required
-                      className="w-full bg-zinc-950 border border-zinc-800 text-white px-4 py-3 focus:border-yellow-500 focus:outline-none transition-colors"
-                      placeholder="Project Inquiry"
-                   />
+                <div className="space-y-2">
+                  <label className="text-sm font-black text-emerald-900 uppercase tracking-widest ml-1">Subject</label>
+                  <input 
+                    type="text" name="subject" value={formData.subject} onChange={handleChange} required
+                    className="w-full bg-gray-50 border-2 border-transparent focus:border-yellow-400 focus:bg-white rounded-2xl px-6 py-4 outline-none transition-all text-gray-900 font-medium"
+                    placeholder="E.g. PCB Design Inquiry"
+                  />
                 </div>
 
-                <div>
-                   <label className="block text-xs font-bold text-yellow-500 uppercase tracking-widest mb-2">Message</label>
-                   <textarea 
-                      name="message" rows="5" value={formData.message} onChange={handleChange} required
-                      className="w-full bg-zinc-950 border border-zinc-800 text-white px-4 py-3 focus:border-yellow-500 focus:outline-none transition-colors resize-none"
-                      placeholder="Tell us about your project..."
-                   ></textarea>
+                <div className="space-y-2">
+                  <label className="text-sm font-black text-emerald-900 uppercase tracking-widest ml-1">Message</label>
+                  <textarea 
+                    name="message" rows="5" value={formData.message} onChange={handleChange} required
+                    className="w-full bg-gray-50 border-2 border-transparent focus:border-yellow-400 focus:bg-white rounded-2xl px-6 py-4 outline-none transition-all text-gray-900 font-medium resize-none"
+                    placeholder="Tell us about your project requirements..."
+                  ></textarea>
                 </div>
 
                 <button 
                   type="submit" disabled={loading}
-                  className="w-full bg-white text-black font-bold uppercase tracking-widest py-4 hover:bg-yellow-500 transition-colors flex justify-center items-center gap-2 group"
+                  className="w-full bg-emerald-900 text-white font-black uppercase tracking-[0.2em] py-5 rounded-2xl hover:bg-emerald-800 hover:shadow-xl hover:shadow-emerald-900/20 transition-all flex justify-center items-center gap-3 group disabled:opacity-70"
                 >
-                   {loading ? (
-                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-black border-t-transparent"></div>
-                   ) : (
-                      <>Send Message <Send size={18} className="group-hover:translate-x-1 transition-transform" /></>
-                   )}
+                  {loading ? (
+                    <div className="animate-spin rounded-full h-6 w-6 border-4 border-white border-t-transparent"></div>
+                  ) : (
+                    <>Send Inquiry <ArrowRight size={20} className="group-hover:translate-x-2 transition-transform" /></>
+                  )}
                 </button>
-             </form>
+              </form>
+            </div>
           </div>
 
         </div>

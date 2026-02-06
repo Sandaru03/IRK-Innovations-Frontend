@@ -34,7 +34,7 @@ const Footer = () => {
           <div>
             <h3 className="text-yellow-500 font-bold text-xl mb-8 uppercase tracking-wide">Explore</h3>
             <ul className="space-y-4 font-bold text-sm uppercase tracking-wider">
-               {['Articles', 'Products', 'FAQ', 'Gallery', 'Contacts'].map((item) => (
+               {['Home', 'About', 'services', 'Project', 'Contacts'].map((item) => (
                  <li key={item}>
                    <a href="#" className="flex items-center hover:text-yellow-500 transition-colors">
                      <span className="text-yellow-500 mr-2">▸</span> {item}
@@ -52,21 +52,21 @@ const Footer = () => {
                   <MapPin className="text-yellow-500 shrink-0" size={20} />
                   <div>
                     <span className="block text-white font-bold mb-1">Address</span>
-                    13 Division St, New York, 16004
+                    Sample
                   </div>
                </li>
                <li className="flex gap-4">
                   <Phone className="text-yellow-500 shrink-0" size={20} />
                   <div>
                     <span className="block text-white font-bold mb-1">Phone:</span>
-                    +1 800 777 000
+                    +94 76 537 6106
                   </div>
                </li>
                <li className="flex gap-4">
                   <Mail className="text-yellow-500 shrink-0" size={20} />
                   <div>
                     <span className="block text-white font-bold mb-1">Email:</span>
-                    support@wolt.com
+                    irkinnovations2022@gmail.com
                   </div>
                </li>
             </ul>
@@ -75,7 +75,7 @@ const Footer = () => {
         </div>
 
         <div className="mt-16 pt-8 border-t border-zinc-800/50 flex flex-col md:flex-row justify-between items-center text-xs uppercase tracking-widest text-zinc-600">
-           <span>Like-themes © All Rights Reserved - 2023 - Purchase</span>
+           <span>IRK Innovations © All Rights Reserved - {new Date().getFullYear()}</span>
         </div>
       </div>
       

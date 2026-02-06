@@ -98,9 +98,6 @@ const ServicesPage = () => {
                 <div className="p-8">
                   <h3 className="text-2xl font-black text-gray-900 mb-4 leading-tight">{service.title}</h3>
                   <p className="text-gray-600 leading-relaxed mb-6">{service.description}</p>
-                  <button className="flex items-center gap-2 text-emerald-700 font-bold hover:gap-4 transition-all">
-                    Learn More <ArrowRight size={20} />
-                  </button>
                 </div>
               </div>
             ))}

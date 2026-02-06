@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import ProjectCard from '../components/ProjectCard';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
@@ -71,10 +72,44 @@ const AnimatedCounter = ({ end, duration = 2000, suffix = "" }) => {
 const HomePage = () => {
   const [apiProjects, setApiProjects] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [expandedFaq, setExpandedFaq] = useState(0);
+  const [expandedFaq, setExpandedFaq] = useState(null);
   const [headerHeight, setHeaderHeight] = useState(0);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    message: ''
+  });
+  const [loading, setLoading] = useState(false);
+
   const headerRef = useRef(null);
   const scrollRef = useRef(null);
+
+  const handleContactChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      // Mapping fields to backend expected: name, email, subject, message
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        subject: `Home Page Inquiry from ${formData.phone}`,
+        message: formData.message
+      };
+      const response = await axios.post('http://localhost:5000/api/contact', payload);
+      toast.success(response.data.message || 'Message sent successfully!');
+      setFormData({ name: '', email: '', phone: '', message: '' });
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to send message.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
 // ... existing code ...
 
 
@@ -272,13 +307,13 @@ const HomePage = () => {
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                  <a 
-                    href="#services" 
+                  <Link 
+                    to="/services" 
                     className="inline-flex items-center justify-center gap-2 bg-emerald-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-emerald-700 transition-all duration-300 shadow-lg"
                   >
                     Our Services
                     <ArrowRight size={20} />
-                  </a>
+                  </Link>
                   <Link 
                     to="/projects" 
                     className="inline-flex items-center justify-center gap-2 bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-white hover:text-gray-900 transition-all duration-300"
@@ -390,13 +425,13 @@ const HomePage = () => {
                 From initial consultation to final installation, we handle every aspect of product development with precision, quality, and innovation at the core.
               </p>
 
-              <a 
-                href="#services"
+              <Link 
+                to="/about"
                 className="inline-flex items-center gap-2 bg-yellow-400 text-gray-900 px-8 py-4 rounded-lg font-bold hover:bg-yellow-500 transition-all duration-300"
               >
                 Learn More
                 <ArrowRight size={20} />
-              </a>
+              </Link>
             </div>
 
           </div>
@@ -612,7 +647,7 @@ const HomePage = () => {
           <div className="text-center">
              {/* Yellow scroll bar removed as per request */}
              <p className="text-gray-300 font-medium text-sm">
-                Professional electrical solutions for every need. <a href="#contact" className="text-yellow-400 underline hover:text-yellow-300">Contact Us Today!</a>
+                Professional electrical solutions for every need. <Link to="/contact" className="text-yellow-400 underline hover:text-yellow-300">Contact Us Today!</Link>
              </p>
           </div>
 
@@ -713,19 +748,12 @@ const HomePage = () => {
 
               {/* Call to Action */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-8">
-                <button className="bg-yellow-400 text-black px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-500 transition-colors flex items-center gap-2">
+                <Link 
+                  to="/about"
+                  className="bg-yellow-400 text-black px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-500 transition-colors flex items-center gap-2"
+                >
                   Know More <ArrowRight size={20} />
-                </button>
-                
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-[#143d2d] flex items-center justify-center text-white">
-                    <Phone size={20} />
-                  </div>
-                  <div>
-                    <p className="text-gray-500 text-xs font-bold uppercase tracking-wider">Call Us 24/7</p>
-                    <p className="text-gray-900 font-black text-xl">+ 0 (123) 456 789</p>
-                  </div>
-                </div>
+                </Link>
               </div>
             </div>
 
@@ -975,9 +1003,12 @@ const HomePage = () => {
               </p>
 
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-                <button className="bg-yellow-400 text-black px-6 py-3 rounded-lg font-bold text-base hover:bg-yellow-500 transition-colors flex items-center gap-2">
+                <Link 
+                  to="/contact" 
+                  className="bg-yellow-400 text-black px-6 py-3 rounded-lg font-bold text-base hover:bg-yellow-500 transition-colors flex items-center gap-2"
+                >
                   Contact Us <ArrowRight size={18} />
-                </button>
+                </Link>
                 
                 <span className="text-gray-400 font-bold hidden sm:block">OR</span>
 
@@ -987,7 +1018,7 @@ const HomePage = () => {
                   </div>
                   <div>
                     <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider">CALL US ANY TIME</p>
-                    <p className="text-white font-black text-lg text-nowrap">+ 0 (123) 456 789</p>
+                    <p className="text-white font-black text-lg text-nowrap">+94 76 537 6106</p>
                   </div>
                 </div>
               </div>
@@ -1000,32 +1031,49 @@ const HomePage = () => {
                   Get a Quote Now!
                 </h3>
                   
-                <form className="space-y-4">
+                <form onSubmit={handleContactSubmit} className="space-y-4">
                   <input 
                     type="text" 
+                    name="name"
+                    value={formData.name}
+                    onChange={handleContactChange}
+                    required
                     placeholder="Your Name" 
                     className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:border-yellow-400 focus:outline-none font-medium transition-colors"
                   />
                   <input 
                     type="email" 
+                    name="email"
+                    value={formData.email}
+                    onChange={handleContactChange}
+                    required
                     placeholder="Your Email" 
                     className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:border-yellow-400 focus:outline-none font-medium transition-colors"
                   />
                   <input 
                     type="tel" 
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleContactChange}
+                    required
                     placeholder="Phone Number" 
                     className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:border-yellow-400 focus:outline-none font-medium transition-colors"
                   />
                   <textarea 
+                    name="message"
+                    value={formData.message}
+                    onChange={handleContactChange}
+                    required
                     placeholder="Your Message" 
                     rows="4"
                     className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:border-yellow-400 focus:outline-none font-medium resize-none transition-colors"
                   ></textarea>
                   <button 
                     type="submit"
-                    className="w-full bg-yellow-400 text-black py-4 rounded-lg font-bold hover:bg-yellow-500 transition-colors shadow-lg"
+                    disabled={loading}
+                    className="w-full bg-yellow-400 text-black py-4 rounded-lg font-bold hover:bg-yellow-500 transition-colors shadow-lg disabled:opacity-50"
                   >
-                    Send Message
+                    {loading ? 'Sending...' : 'Send Message'}
                   </button>
                 </form>
               </div>
@@ -1045,131 +1093,36 @@ const HomePage = () => {
             Discover our latest insights and<br />expert advice
           </h2>
           <p className="text-xl mb-10 text-white/90">
-            Stay updated with the latest trends in electronics design and manufacturing
+            End-to-end electronics design and manufacturing services built for quality, efficiency, and long-term reliability.
           </p>
-          <button className="bg-yellow-400 text-gray-900 px-10 py-4 rounded-lg font-bold text-lg hover:bg-yellow-500 transition-all duration-300 shadow-xl">
-            Read Our Blog
-          </button>
+          <div className="inline-flex items-center group">
+  {/* Highlighted Main Text */}
+  <div className="flex flex-col">
+    <span className="text-3xl font-black tracking-tighter text-emerald-950 uppercase italic leading-none">
+      IRK
+    </span>
+    {/* Underline wenuwata podi dot indicator ekak use karamu highlight ekata */}
+    <div className="w-2 h-2 bg-yellow-400 rounded-full mt-1.5 opacity-80"></div>
+  </div>
+
+  {/* Vertical Technical Divider */}
+  <div className="h-10 w-[2px] bg-gray-200 mx-4 rotate-12 transition-colors group-hover:bg-yellow-400"></div>
+
+  {/* Supporting Brand Text */}
+  <div className="flex flex-col justify-center">
+    <span className="text-sm font-bold tracking-[0.3em] text-emerald-700/70 uppercase">
+      Innovations
+    </span>
+    <span className="text-[10px] font-medium text-gray-400 uppercase tracking-widest mt-0.5">
+      Engineering Solutions
+    </span>
+  </div>
+</div>
         </div>
       </section>
 
       {/* ================= FOOTER ================= */}
-      <footer className="bg-linear-to-br from-emerald-800 to-emerald-950 text-white pt-16 pb-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          {/* Main Footer Content */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-            
-            {/* Company Info */}
-            <div>
-              <div className="flex items-center gap-2 mb-6">
-                <div className="w-10 h-10 bg-yellow-400 rounded-lg flex items-center justify-center">
-                  <Zap size={24} className="text-gray-900" />
-                </div>
-                <span className="text-2xl font-black">IRK Innovations</span>
-              </div>
-              <p className="text-emerald-200 leading-relaxed mb-6">
-                Leading electronics product design and manufacturing company with 10+ years of experience.
-              </p>
-              <div className="flex gap-3">
-                <a href="#" className="w-10 h-10 bg-white/10 hover:bg-yellow-400 rounded-lg flex items-center justify-center transition-all duration-300 group">
-                  <Facebook size={20} className="group-hover:text-gray-900" />
-                </a>
-                <a href="#" className="w-10 h-10 bg-white/10 hover:bg-yellow-400 rounded-lg flex items-center justify-center transition-all duration-300 group">
-                  <Twitter size={20} className="group-hover:text-gray-900" />
-                </a>
-                <a href="#" className="w-10 h-10 bg-white/10 hover:bg-yellow-400 rounded-lg flex items-center justify-center transition-all duration-300 group">
-                  <Instagram size={20} className="group-hover:text-gray-900" />
-                </a>
-                <a href="#" className="w-10 h-10 bg-white/10 hover:bg-yellow-400 rounded-lg flex items-center justify-center transition-all duration-300 group">
-                  <Linkedin size={20} className="group-hover:text-gray-900" />
-                </a>
-              </div>
-            </div>
-
-            {/* Quick Links */}
-            <div>
-              <h3 className="text-xl font-black mb-6">Quick Links</h3>
-              <ul className="space-y-3">
-                {['About Us', 'Services', 'Projects', 'Contact', 'Blog'].map((link) => (
-                  <li key={link}>
-                    <a href="#" className="text-emerald-200 hover:text-yellow-400 transition-colors font-medium">
-                      {link}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Services */}
-            <div>
-              <h3 className="text-xl font-black mb-6">Our Services</h3>
-              <ul className="space-y-3">
-                {[
-                  'PCB Design',
-                  'Manufacturing',
-                  'Product Testing',
-                  'Consultation',
-                  'Assembly'
-                ].map((service) => (
-                  <li key={service}>
-                    <a href="#" className="text-emerald-200 hover:text-yellow-400 transition-colors font-medium">
-                      {service}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Contact Info */}
-            <div>
-              <h3 className="text-xl font-black mb-6">Contact Info</h3>
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <MapPin size={20} className="text-yellow-400 shrink-0 mt-1" />
-                  <div>
-                    <p className="text-emerald-200 font-medium">Colombo, Sri Lanka</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Phone size={20} className="text-yellow-400 shrink-0 mt-1" />
-                  <div>
-                    <p className="text-emerald-200 font-medium">076 537 6106</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Mail size={20} className="text-yellow-400 shrink-0 mt-1" />
-                  <div>
-                    <p className="text-emerald-200 font-medium">info@irkinnovations.com</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Bottom Bar */}
-          <div className="border-t border-emerald-700 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <p className="text-emerald-200 text-sm">
-                © 2026 IRK Innovations. All rights reserved.
-              </p>
-              <div className="flex gap-6">
-                <a href="#" className="text-emerald-200 hover:text-yellow-400 text-sm font-medium transition-colors">
-                  Privacy Policy
-                </a>
-                <a href="#" className="text-emerald-200 hover:text-yellow-400 text-sm font-medium transition-colors">
-                  Terms of Service
-                </a>
-                <a href="#" className="text-emerald-200 hover:text-yellow-400 text-sm font-medium transition-colors">
-                  Cookie Policy
-                </a>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </footer>
+      <Footer />
 
       {/* Scroll To Top Button */}
       <button 
