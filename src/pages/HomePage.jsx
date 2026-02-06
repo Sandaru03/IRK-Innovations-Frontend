@@ -834,6 +834,45 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* ================= PROJECTS SECTION ================= */}
+      <section id="projects" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 mb-4">
+              <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+              <p className="text-yellow-600 font-bold uppercase tracking-wider text-sm">OUR PORTFOLIO</p>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
+              Discover our latest insights and<br />expert projects
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+            {apiProjects.length > 0 ? (
+              apiProjects.slice(0, 6).map((project) => (
+                <ProjectCard key={project._id} project={project} />
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-20">
+                <p className="text-gray-500 text-lg">No projects to display at the moment.</p>
+              </div>
+            )}
+          </div>
+
+          <div className="text-center">
+            <Link 
+              to="/projects" 
+              className="inline-flex items-center gap-2 bg-emerald-600 text-white px-10 py-4 rounded-lg font-bold hover:bg-emerald-700 transition-all duration-300 shadow-lg"
+            >
+              View All Projects
+              <ArrowRight size={20} />
+            </Link>
+          </div>
+
+        </div>
+      </section>
+
       {/* ================= FAQ ================= */}
       <section id="faq" className="py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -997,44 +1036,7 @@ const HomePage = () => {
       </section>
       </div>
 
-      {/* ================= PROJECTS SECTION ================= */}
-      <section id="projects" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 mb-4">
-              <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
-              <p className="text-yellow-600 font-bold uppercase tracking-wider text-sm">OUR PORTFOLIO</p>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
-              Discover our latest insights and<br />expert projects
-            </h2>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {apiProjects.length > 0 ? (
-              apiProjects.slice(0, 6).map((project) => (
-                <ProjectCard key={project._id} project={project} />
-              ))
-            ) : (
-              <div className="col-span-3 text-center py-20">
-                <p className="text-gray-500 text-lg">No projects to display at the moment.</p>
-              </div>
-            )}
-          </div>
-
-          <div className="text-center">
-            <Link 
-              to="/projects" 
-              className="inline-flex items-center gap-2 bg-emerald-600 text-white px-10 py-4 rounded-lg font-bold hover:bg-emerald-700 transition-all duration-300 shadow-lg"
-            >
-              View All Projects
-              <ArrowRight size={20} />
-            </Link>
-          </div>
-
-        </div>
-      </section>
 
       {/* ================= BLOG CTA ================= */}
       <section className="py-20 bg-linear-to-br from-emerald-700 to-emerald-900 text-white">
