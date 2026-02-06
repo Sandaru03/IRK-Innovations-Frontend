@@ -34,7 +34,7 @@ const Dashboard = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/api/projects');
+      const response = await axios.get('http://localhost:5000/api/projects');
       setProjects(response.data);
       setLoading(false);
     } catch (error) {
@@ -103,9 +103,9 @@ const Dashboard = () => {
     e.preventDefault();
     try {
       if (editingProject) {
-        await axios.put(`http://localhost:5001/api/projects/${editingProject._id}`, formData, config);
+        await axios.put(`http://localhost:5000/api/projects/${editingProject._id}`, formData, config);
       } else {
-        await axios.post('http://localhost:5001/api/projects', formData, config);
+        await axios.post('http://localhost:5000/api/projects', formData, config);
       }
       
       fetchProjects();
@@ -157,7 +157,7 @@ alert('Error saving project');
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this project?')) {
       try {
-        await axios.delete(`http://localhost:5001/api/projects/${id}`, config);
+        await axios.delete(`http://localhost:5000/api/projects/${id}`, config);
         fetchProjects();
       } catch (error) {
         console.error('Error deleting project:', error);

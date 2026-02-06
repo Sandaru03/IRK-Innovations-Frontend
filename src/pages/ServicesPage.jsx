@@ -130,7 +130,7 @@ const ServicesPage = () => {
             ))}
           </div>
 
-          <div className="mt-12 bg-emerald-900 rounded-[2rem] p-8 text-white flex flex-col md:flex-row items-center gap-6 shadow-2xl">
+          <div className="mt-12 bg-emerald-900 rounded-4xl p-8 text-white flex flex-col md:flex-row items-center gap-6 shadow-2xl">
 
             <div>
               <h4 className="text-xl font-bold mb-2">Efficiency Note:</h4>
