@@ -137,7 +137,7 @@ const ServicesPage = () => {
           </div>
           
           <div className="relative group">
-            <div className="absolute -inset-1 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+            <div className="absolute -inset-1 bg-linear-to-r from-yellow-500 to-orange-500 rounded-3xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
             <div className="relative bg-zinc-900 p-12 rounded-3xl border border-zinc-800">
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-3 bg-yellow-500 rounded-lg">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import ProjectCard from '../components/ProjectCard';
@@ -8,27 +8,146 @@ import {
   CheckCircle, ArrowRight, Phone, Mail, MapPin, 
   ChevronLeft, ChevronRight, Zap, Award, Users, Target, 
   Plus, Minus, Cpu, CircuitBoard, Factory, Globe, Settings,
-  Shield, Sparkles, TrendingUp, Wrench
+  Shield, Sparkles, TrendingUp, Wrench, Star, Clock, ThumbsUp,
+  Facebook, Twitter, Instagram, Linkedin, Youtube,
+  Circle, Square, Hexagon, Activity
 } from 'lucide-react';
+
+// Counter Component for Animation
+const AnimatedCounter = ({ end, duration = 2000, suffix = "" }) => {
+  const [count, setCount] = useState(0);
+  const countRef = useRef(null);
+  const [hasStarted, setHasStarted] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasStarted) {
+          setHasStarted(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (countRef.current) {
+      observer.observe(countRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [hasStarted]);
+
+  useEffect(() => {
+    if (!hasStarted) return;
+
+    let startTime;
+    let animationFrame;
+
+    const animate = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const progress = timestamp - startTime;
+      const percentage = Math.min(progress / duration, 1);
+      
+      // Easing function for smooth animation
+      const easeOutQuad = (t) => t * (2 - t);
+      const currentCount = Math.floor(easeOutQuad(percentage) * end);
+
+      setCount(currentCount);
+
+      if (progress < duration) {
+        animationFrame = requestAnimationFrame(animate);
+      } else {
+        setCount(end);
+      }
+    };
+
+    animationFrame = requestAnimationFrame(animate);
+
+    return () => cancelAnimationFrame(animationFrame);
+  }, [end, duration, hasStarted]);
+
+  return <span ref={countRef}>{count}{suffix}</span>;
+};
 
 const HomePage = () => {
   const [apiProjects, setApiProjects] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [expandedFaq, setExpandedFaq] = useState(0);
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const headerRef = useRef(null);
+  const scrollRef = useRef(null);
+// ... existing code ...
+
+
+  // Continuous Auto-scroll effect (Marquee)
+  useEffect(() => {
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer) return;
+
+    let animationFrameId;
+    
+    const scroll = () => {
+      if (scrollContainer) {
+        // Continuous scroll speed
+        scrollContainer.scrollLeft += 1; 
+
+        // Check if we are near the end (looping logic)
+        // We have duplicates. Reset when we scroll past half the width (approx one set of items)
+        if (scrollContainer.scrollLeft >= (scrollContainer.scrollWidth / 2)) {
+           // Reset to 0 (or a small offset if needed for perfect smoothness, but 0 works if duplicates are exact)
+           scrollContainer.scrollLeft = 0;
+        }
+      }
+      animationFrameId = requestAnimationFrame(scroll);
+    };
+
+    // Start scrolling
+    animationFrameId = requestAnimationFrame(scroll);
+
+    // Pause on hover
+    const stopScroll = () => cancelAnimationFrame(animationFrameId);
+    const startScroll = () => { cancelAnimationFrame(animationFrameId); animationFrameId = requestAnimationFrame(scroll); };
+
+    scrollContainer.addEventListener('mouseenter', stopScroll);
+    scrollContainer.addEventListener('mouseleave', startScroll);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      scrollContainer.removeEventListener('mouseenter', stopScroll);
+      scrollContainer.removeEventListener('mouseleave', startScroll);
+    };
+  }, []);
+
+  useEffect(() => {
+    const updateHeaderHeight = () => {
+      if (headerRef.current) {
+        setHeaderHeight(headerRef.current.offsetHeight);
+      }
+    };
+
+    // Initial measurement
+    updateHeaderHeight();
+
+    // Update on resize
+    window.addEventListener('resize', updateHeaderHeight);
+    return () => window.removeEventListener('resize', updateHeaderHeight);
+  }, []);
 
   // Hero Slider Images
   const slides = [
     {
-      image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop",
+      image: "https://images.unsplash.com/photo-1592659762303-90081d34b277?q=80&w=2070&auto=format&fit=crop", // Close-up circuit board
       title: "Electronic Innovation",
+      subtitle: "10+ Years Industry Experience"
     },
     {
-      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop",
+      image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop", // Logic board / manufacturing
       title: "Precision Manufacturing",
+      subtitle: "End-to-End Solutions"
     },
     {
-      image: "https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?q=80&w=2070&auto=format&fit=crop", // Automation/Smart Lab
+      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop", // Industrial/technical work
       title: "Smart Solutions",
+      subtitle: "Quality You Can Trust"
     }
   ];
 
@@ -58,555 +177,1008 @@ const HomePage = () => {
   };
 
   return (
-    <div className="font-sans text-slate-200 bg-zinc-950 min-h-screen">
+    <div className="font-sans text-gray-800 bg-white min-h-screen">
       
-      <NavBar />
+      {/* ================= FIXED HEADER WRAPPER ================= */}
+      <header ref={headerRef} className="fixed top-0 w-full z-50">
+        {/* ================= TOP INFO BAR ================= */}
+        <div className="bg-emerald-700 text-white py-3">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2">
+                  <Phone size={16} />
+                  <span className="font-medium">076 537 6106</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Mail size={16} />
+                  <span className="font-medium">info@irkinnovations.com</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <span className="font-medium">Follow us:</span>
+                <div className="flex gap-3">
+                  <a href="#" className="hover:text-yellow-400 transition-colors">
+                    <Facebook size={18} />
+                  </a>
+                  <a href="#" className="hover:text-yellow-400 transition-colors">
+                    <Twitter size={18} />
+                  </a>
+                  <a href="#" className="hover:text-yellow-400 transition-colors">
+                    <Instagram size={18} />
+                  </a>
+                  <a href="#" className="hover:text-yellow-400 transition-colors">
+                    <Linkedin size={18} />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  
+        <NavBar position="static" />
+      </header>
 
-      {/* ================= HERO SECTION ================= */}
-      <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Slider */}
-        {slides.map((slide, index) => (
-           <div 
-             key={index}
-             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
-           >
-              <div className="absolute inset-0 bg-linear-to-b from-black/60 via-black/70 to-zinc-950 z-10"></div>
-              <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" />
-           </div>
-        ))}
+      {/* ================= HERO SLIDER SECTION ================= */}
+      <section id="home" className="relative h-[700px] overflow-hidden" style={{ marginTop: headerHeight }}>
         
+        {/* Slider Images */}
+        {slides.map((slide, index) => (
+          <div 
+            key={index}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              index === currentSlide ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <img 
+              src={slide.image} 
+              alt={slide.title} 
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-linear-to-r from-black/70 via-black/50 to-transparent"></div>
+          </div>
+        ))}
+
         {/* Slider Controls */}
         <button 
           onClick={prevSlide} 
-          className="absolute left-4 md:left-8 z-30 p-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full text-white/70 hover:text-yellow-500 hover:border-yellow-500/50 transition-all duration-300"
+          className="hidden md:block absolute left-8 top-1/2 -translate-y-1/2 z-30 p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white hover:bg-yellow-400 hover:border-yellow-400 transition-all duration-300"
         >
-           <ChevronLeft size={24} />
+          <ChevronLeft size={24} />
         </button>
         <button 
           onClick={nextSlide} 
-          className="absolute right-4 md:right-8 z-30 p-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full text-white/70 hover:text-yellow-500 hover:border-yellow-500/50 transition-all duration-300"
+          className="hidden md:block absolute right-8 top-1/2 -translate-y-1/2 z-30 p-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white hover:bg-yellow-400 hover:border-yellow-400 transition-all duration-300"
         >
-           <ChevronRight size={24} />
+          <ChevronRight size={24} />
         </button>
 
-        {/* Content */}
-        <div className="relative z-20 max-w-6xl mx-auto px-4 text-center">
+        {/* Hero Content */}
+        <div className="absolute inset-0 z-20 flex items-center">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start mt-[-60px] md:mt-[-40px]">
+              
+              {/* Left: Text Content */}
+              <div className="text-white">
 
 
-           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-6">
-             Customized Electronics <br/>
-             <span className="text-transparent bg-clip-text bg-linear-to-r from-yellow-400 to-yellow-600">
-               Products Design & Manufacturing
-             </span>
-           </h1>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-tight mb-6">
+                  Your trusted partner for
+                  <span className="block text-yellow-400">all your electronics needs</span>
+                </h1>
 
-           <p className="text-base md:text-lg lg:text-xl text-zinc-300 mb-3 max-w-3xl mx-auto font-light leading-relaxed">
-             10+ Years Industry Experience in Delivering Smart Solutions.
-           </p>
-           <p className="text-lg md:text-xl text-white mb-10 max-w-2xl mx-auto font-semibold">
-             We need your problem only — we will give you the solution.
-           </p>
+                <p className="text-lg md:text-xl text-gray-200 mb-8 leading-relaxed max-w-xl">
+                  Customized Electronics Products Design & Manufacturing. We need your problem only — we will give you the solution.
+                </p>
 
-           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-             <a 
-               href="#services" 
-               className="group relative bg-yellow-500 text-black px-10 py-4 font-bold uppercase tracking-widest overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-yellow-500/30"
-             >
-               <span className="relative z-10">Explore Services</span>
-               <div className="absolute inset-0 bg-yellow-400 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
-             </a>
-             <a 
-               href="#contact" 
-               className="group bg-transparent border-2 border-white/30 text-white px-10 py-4 font-bold uppercase tracking-widest hover:border-yellow-500 hover:bg-yellow-500/10 transition-all duration-300"
-             >
-               Contact Us
-               <ArrowRight size={16} className="inline-block ml-2 group-hover:translate-x-1 transition-transform" />
-             </a>
-           </div>
+                <div className="flex flex-col sm:flex-row gap-4 mb-12">
+                  <a 
+                    href="#services" 
+                    className="inline-flex items-center justify-center gap-2 bg-emerald-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-emerald-700 transition-all duration-300 shadow-lg"
+                  >
+                    Our Services
+                    <ArrowRight size={20} />
+                  </a>
+                  <Link 
+                    to="/projects" 
+                    className="inline-flex items-center justify-center gap-2 bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-white hover:text-gray-900 transition-all duration-300"
+                  >
+                    Our Projects
+                  </Link>
+                </div>
+
+                {/* Stats */}
+                {/* Stats Removed as per request */}
+              </div>
+
+
+
+            </div>
+          </div>
         </div>
 
         {/* Slide Indicators */}
-        <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2 z-30 flex gap-3">
-           {slides.map((_, idx) => (
-             <button 
-               key={idx} 
-               onClick={() => setCurrentSlide(idx)}
-               className={`h-1 rounded-full transition-all duration-300 ${
-                 idx === currentSlide 
-                   ? 'w-12 bg-yellow-500' 
-                   : 'w-8 bg-white/30 hover:bg-white/50'
-               }`}
-             />
-           ))}
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-30 flex gap-3">
+          {slides.map((_, idx) => (
+            <button 
+              key={idx} 
+              onClick={() => setCurrentSlide(idx)}
+              className={`h-1 rounded-full transition-all duration-300 ${
+                idx === currentSlide 
+                  ? 'w-12 bg-yellow-400' 
+                  : 'w-8 bg-white/40 hover:bg-white/60'
+              }`}
+            />
+          ))}
         </div>
-
-        {/* Scroll Indicator */}
 
       </section>
 
-      {/* ================= COMPANY INTRO ================= */}
-      <section className="py-20 bg-zinc-950 border-b border-zinc-900">
+      {/* ================= SERVICES INTRO ================= */}
+      <section className="py-20 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             
-            {/* Left: Content */}
+            {/* Left: Image Grid with Floating Animation */}
+            <div className="relative">
+              <style jsx>{`
+                @keyframes float-1 {
+                  0%, 100% { transform: translateY(0); }
+                  50% { transform: translateY(-15px); }
+                }
+                @keyframes float-2 {
+                  0%, 100% { transform: translateY(0); }
+                  50% { transform: translateY(15px); }
+                }
+                .animate-float-1 {
+                  animation: float-1 5s ease-in-out infinite;
+                }
+                .animate-float-2 {
+                  animation: float-2 6s ease-in-out infinite;
+                }
+              `}</style>
+              
+              <div className="grid grid-cols-2 gap-4">
+                {/* Column 1: Floats Up/Down */}
+                <div className="space-y-4 animate-float-1">
+                  <img 
+                    src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=600&auto=format&fit=crop" 
+                    alt="Electronics Lab" 
+                    className="w-full h-48 object-cover rounded-lg shadow-lg"
+                  />
+                  <img 
+                    src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=600&auto=format&fit=crop" 
+                    alt="Circuit Design" 
+                    className="w-full h-64 object-cover rounded-lg shadow-lg"
+                  />
+                </div>
+
+                {/* Column 2: Floats Down/Up (Diff Rhythm) */}
+                <div className="space-y-4 pt-8 animate-float-2">
+                  <img 
+                    src="https://images.unsplash.com/photo-1616440347437-b1c73416efc2?q=80&w=600&auto=format&fit=crop" 
+                    alt="PCB Board" 
+                    className="w-full h-64 object-cover rounded-lg shadow-lg"
+                  />
+                  <img 
+                    src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop" 
+                    alt="Manufacturing" 
+                    className="w-full h-48 object-cover rounded-lg shadow-lg"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Content */}
             <div>
-              <div className="inline-block mb-6 px-4 py-1.5 bg-yellow-500/10 border border-yellow-500/30 rounded-full">
-                <span className="text-yellow-500 font-bold tracking-widest uppercase text-xs">About IRK Innovations</span>
+              <div className="inline-flex items-center gap-2 mb-6">
+                <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+                <p className="text-yellow-600 font-bold uppercase tracking-wider text-sm">ABOUT IRK INNOVATIONS</p>
               </div>
               
-              <h2 className="text-4xl md:text-5xl font-black text-white mb-6 leading-tight">
-                Your Partner in <br/>
-                <span className="text-yellow-500">Electronic Innovation</span>
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-6 leading-tight">
+                Complete electronics services for
+                <span className="block text-emerald-600">every industry</span>
               </h2>
               
-              <p className="text-zinc-400 text-lg leading-relaxed mb-6">
+              <p className="text-gray-600 text-lg leading-relaxed mb-6">
                 IRK Innovations is a leading electronics product design and manufacturing company with over 10 years of industry experience. We specialize in delivering customized, end-to-end solutions that transform ideas into reality.
               </p>
               
-              <p className="text-zinc-400 text-lg leading-relaxed mb-8">
-                From initial consultation to final installation, we handle every aspect of product development with precision, quality, and innovation at the core of everything we do.
+              <p className="text-gray-600 text-lg leading-relaxed mb-8">
+                From initial consultation to final installation, we handle every aspect of product development with precision, quality, and innovation at the core.
               </p>
 
-              <div className="flex flex-wrap gap-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-yellow-500/10 rounded-full flex items-center justify-center">
-                    <CheckCircle className="text-yellow-500" size={24} />
-                  </div>
-                  <div>
-                    <div className="text-white font-bold">10+ Years</div>
-                    <div className="text-zinc-500 text-sm">Experience</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-yellow-500/10 rounded-full flex items-center justify-center">
-                    <Users className="text-yellow-500" size={24} />
-                  </div>
-                  <div>
-                    <div className="text-white font-bold">500+</div>
-                    <div className="text-zinc-500 text-sm">Projects Delivered</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-yellow-500/10 rounded-full flex items-center justify-center">
-                    <Globe className="text-yellow-500" size={24} />
-                  </div>
-                  <div>
-                    <div className="text-white font-bold">Global</div>
-                    <div className="text-zinc-500 text-sm">Client Base</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right: Images */}
-            <div className="relative">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-4">
-                  <img 
-                    src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=800&auto=format&fit=crop" 
-                    alt="Electronics Lab" 
-                    className="w-full h-64 object-cover rounded-lg shadow-xl"
-                  />
-                  <img 
-                    src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800&auto=format&fit=crop" 
-                    alt="Circuit Design" 
-                    className="w-full h-48 object-cover rounded-lg shadow-xl"
-                  />
-                </div>
-                <div className="space-y-4 pt-12">
-                  <img 
-                    src="https://images.unsplash.com/photo-1616440347437-b1c73416efc2?q=80&w=800&auto=format&fit=crop" 
-                    alt="PCB Board" 
-                    className="w-full h-48 object-cover rounded-lg shadow-xl"
-                  />
-                  <img 
-                    src="https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?q=80&w=800&auto=format&fit=crop" 
-                    alt="Quality Control" 
-                    className="w-full h-64 object-cover rounded-lg shadow-xl"
-                  />
-                </div>
-              </div>
-              
-              {/* Floating Badge */}
-              <div className="absolute -bottom-6 -left-6 bg-yellow-500 text-black px-8 py-6 rounded-lg shadow-2xl">
-                <div className="text-4xl font-black mb-1">98%</div>
-                <div className="text-sm font-bold uppercase tracking-wider">Client Satisfaction</div>
-              </div>
+              <a 
+                href="#services"
+                className="inline-flex items-center gap-2 bg-yellow-400 text-gray-900 px-8 py-4 rounded-lg font-bold hover:bg-yellow-500 transition-all duration-300"
+              >
+                Learn More
+                <ArrowRight size={20} />
+              </a>
             </div>
 
           </div>
         </div>
       </section>
 
-      {/* ================= SERVICES & CAPABILITIES ================= */}
-      <section id="services" className="py-24 bg-zinc-900 relative overflow-hidden">
+      {/* ================= SERVICES SECTION ================= */}
+      <section id="services" className="py-24 bg-gray-50 relative overflow-hidden">
+        {/* Subtle Background Pattern */}
+        <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-yellow-400/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-96 h-96 bg-emerald-600/5 rounded-full blur-3xl"></div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          
+          {/* Section Header */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 mb-4">
+              <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+              <p className="text-yellow-600 font-bold uppercase tracking-wider text-sm">OUR EXPERTISE</p>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-6 leading-tight">
+              Comprehensive solutions for <br/>
+              <span className="text-yellow-500">modern challenges</span>
+            </h2>
+            <p className="text-gray-500 text-lg max-w-2xl mx-auto">
+              We combine technical expertise with innovative thinking to deliver high-quality electronics engineering services tailored to your specific needs.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { 
+                title: "Engineering Consultation", 
+                icon: <Users />,
+                description: "Expert guidance in embedded product design, feasibility studies, and manufacturing strategies."
+              },
+              { 
+                title: "Architecture & PCB Design", 
+                icon: <CircuitBoard />,
+                description: "Professional-grade PCB layout and system architecture design optimized for performance and cost."
+              },
+              { 
+                title: "Cost & BOM Optimization", 
+                icon: <TrendingUp />,
+                description: "Strategic component selection and Bill of Materials optimization to maximize value."
+              },
+              { 
+                title: "DFM & DFA Analysis", 
+                icon: <Settings />,
+                description: "Design for Manufacturing and Assembly reviews to ensure seamless production scalability."
+              },
+              { 
+                title: "Product Testing & QA", 
+                icon: <Shield />,
+                description: "Comprehensive testing protocols including functional, environmental, and reliability testing."
+              },
+              { 
+                title: "Bulk Manufacturing", 
+                icon: <Factory />,
+                description: "End-to-end manufacturing services from prototyping to high-volume production waves."
+              },
+            ].map((item, index) => (
+              <div 
+                key={index} 
+                className="group bg-white p-8 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 relative overflow-hidden"
+              >
+                {/* Top Accent Line */}
+                <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-emerald-500 to-yellow-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+
+                <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-600 transition-colors duration-300">
+                  {React.cloneElement(item.icon, { 
+                    size: 28, 
+                    className: "text-emerald-600 group-hover:text-white transition-colors duration-300",
+                    strokeWidth: 2
+                  })}
+                </div>
+                
+                <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-emerald-700 transition-colors">
+                  {item.title}
+                </h3>
+                <p className="text-gray-500 leading-relaxed text-sm">
+                  {item.description}
+                </p>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ================= SPECIALIZED SERVICES (Green Section) ================= */}
+      {/* ================= SPECIALIZED SERVICES (Green Section) ================= */}
+      <section className="py-24 bg-[#143d2d] text-white relative overflow-hidden font-sans">
+        
         {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-[0.02]">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'radial-gradient(circle at 2px 2px, rgb(234, 179, 8) 1px, transparent 0)',
-            backgroundSize: '32px 32px'
-          }}></div>
+        {/* User Patterns - Transparent SVGs */}
+        <Circle strokeWidth={1} size={300} className="absolute -top-24 -left-24 text-white opacity-5 pointer-events-none" />
+        <Square strokeWidth={1} size={400} className="absolute -bottom-48 -right-24 text-white opacity-5 pointer-events-none rotate-12" />
+        <Hexagon strokeWidth={1} size={200} className="absolute top-1/3 -right-20 text-white opacity-5 pointer-events-none rotate-45" />
+
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-64 h-64 border-r border-b border-white/20 rounded-br-[100px]"></div>
+          <div className="absolute right-0 bottom-0 w-96 h-96 rounded-tl-full border-t border-l border-white/10"></div>
+          <div className="absolute right-10 bottom-10 grid grid-cols-12 gap-2">
+             {[...Array(48)].map((_, i) => (
+               <div key={i} className="w-1 h-1 bg-white/30 rounded-full"></div>
+             ))}
+          </div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-           <div className="text-center mb-20">
-              <div className="inline-block mb-6 px-6 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-full">
-                <span className="text-yellow-500 font-bold tracking-widest uppercase text-sm">What We Offer</span>
-              </div>
-              <h3 className="text-5xl md:text-6xl font-black text-white mb-6">
-                Services & Capabilities
-              </h3>
-              <div className="w-24 h-1.5 bg-linear-to-r from-transparent via-yellow-500 to-transparent mx-auto mb-6"></div>
-              <p className="text-zinc-400 max-w-3xl mx-auto text-lg leading-relaxed">
-                End-to-End Customized Electronics Product Design & Manufacturing. <br/>
-                We follow standard product development steps and handle design, manufacturing, and installation.
-              </p>
-           </div>
-
-           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                { 
-                  title: "Engineering Consultation", 
-                  icon: <Users />,
-                  description: "Expert guidance in embedded product design and manufacturing with over 10 years of experience."
-                },
-                { 
-                  title: "Architecture & PCB Design", 
-                  icon: <CircuitBoard />,
-                  description: "Complete electronics product architecture design and professional PCB designing."
-                },
-                { 
-                  title: "Cost & BOM Optimization", 
-                  icon: <TrendingUp />,
-                  description: "Optimizing Bill of Materials (BOM) and manufacturing costs without compromising quality."
-                },
-                { 
-                  title: "DFM & DFA", 
-                  icon: <Settings />,
-                  description: "Design for Manufacturing (DFM) and Design for Assembly (DFA) to ensure smooth production."
-                },
-                { 
-                  title: "Product Testing", 
-                  icon: <Shield />,
-                  description: "Rigorous testing protocols to ensure reliability, safety, and performance of every unit."
-                },
-                { 
-                  title: "Assembly Optimization", 
-                  icon: <Wrench />,
-                  description: "Streamlining assembly processes for maximum efficiency and reduced turnaround time."
-                },
-                { 
-                  title: "Bulk Manufacturing", 
-                  icon: <Factory />,
-                  description: "Capacity for electronics bulk manufacturing, handling small batches to large-scale runs."
-                },
-                { 
-                  title: "Global Sourcing", 
-                  icon: <Globe />,
-                  description: "Sourcing electronic components and tech products, specializing in imports from China."
-                },
-              ].map((item, index) => (
-                <div 
-                  key={index} 
-                  className="group relative bg-zinc-950 border border-zinc-800 p-8 rounded-xl overflow-hidden transition-all duration-500 hover:border-yellow-500/50 hover:-translate-y-2 hover:shadow-2xl hover:shadow-yellow-500/10"
-                >
-                   {/* Background Glow */}
-                   <div className="absolute inset-0 bg-linear-to-br from-yellow-500/0 via-yellow-500/0 to-yellow-500/0 group-hover:from-yellow-500/5 group-hover:via-yellow-500/10 group-hover:to-transparent transition-all duration-500"></div>
-                   
-                   {/* Top Line Accent */}
-                   <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-transparent via-yellow-500/0 to-transparent group-hover:via-yellow-500 transition-all duration-500"></div>
-                   
-                   {/* Icon */}
-                   <div className="relative mb-6 inline-block">
-                      <div className="w-14 h-14 bg-zinc-900 border border-zinc-800 rounded-lg flex items-center justify-center group-hover:bg-yellow-500 group-hover:border-yellow-500 transition-all duration-500 group-hover:scale-110">
-                        {React.cloneElement(item.icon, { 
-                          size: 28, 
-                          className: "text-yellow-500 group-hover:text-black transition-colors duration-500",
-                          strokeWidth: 2
-                        })}
-                      </div>
-                   </div>
-                   
-                   {/* Content */}
-                   <div className="relative">
-                     <h4 className="text-white font-black text-xl mb-4 group-hover:text-yellow-500 transition-colors duration-300">
-                       {item.title}
-                     </h4>
-                     <p className="text-zinc-400 text-sm leading-relaxed group-hover:text-zinc-300 transition-colors duration-300">
-                       {item.description}
-                     </p>
-                   </div>
-
-                   {/* Bottom Arrow */}
-                   <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
-                     <ArrowRight size={20} className="text-yellow-500" />
-                   </div>
-                </div>
-              ))}
-           </div>
-        </div>
-      </section>
-
-      {/* ================= PROCESS TIMELINE ================= */}
-      <section className="py-24 bg-zinc-950 border-y border-zinc-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
           <div className="text-center mb-16">
-            <div className="inline-block mb-6 px-6 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-full">
-              <span className="text-yellow-500 font-bold tracking-widest uppercase text-sm">Our Process</span>
+            <div className="inline-flex items-center gap-2 mb-4">
+              <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+              <p className="text-yellow-400 font-bold uppercase tracking-wider text-sm">Our Services</p>
             </div>
-            <h3 className="text-5xl md:text-6xl font-black text-white mb-4">
-              How We Work
-            </h3>
-            <div className="w-24 h-1.5 bg-linear-to-r from-transparent via-yellow-500 to-transparent mx-auto"></div>
+            <h2 className="text-4xl md:text-5xl font-black mb-4 leading-tight">
+              Specialized electrical services<br />
+              for <span className="text-yellow-400">every industry</span>
+            </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Horizontal Scrolling Container - Hiding Scrollbar Explicitly */}
+          <style jsx>{`
+            .hide-scrollbar::-webkit-scrollbar {
+              display: none;
+            }
+            .hide-scrollbar {
+              -ms-overflow-style: none;
+              scrollbar-width: none;
+            }
+          `}</style>
+          
+          <div 
+            ref={scrollRef} 
+            className="flex overflow-x-auto gap-8 pb-12 items-stretch hide-scrollbar px-4"
+          >
             {[
-              { step: "01", title: "Consultation", desc: "Understanding your requirements and challenges", icon: <Users /> },
-              { step: "02", title: "Design & Development", desc: "Architecture, PCB design, and prototyping", icon: <CircuitBoard /> },
-              { step: "03", title: "Manufacturing", desc: "Bulk production with quality assurance", icon: <Factory /> },
-              { step: "04", title: "Delivery & Support", desc: "Installation and ongoing support", icon: <Zap /> }
-            ].map((item, index) => (
-              <div key={index} className="relative h-full">
-                {/* Connector Line */}
-                {index < 3 && (
-                  <div className="hidden lg:block absolute top-12 left-[60%] w-full h-0.5 bg-linear-to-r from-yellow-500/50 to-transparent"></div>
-                )}
-                
-                <div className="relative bg-zinc-900 border border-zinc-800 p-8 rounded-xl hover:border-yellow-500/50 transition-all duration-300 group h-full">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="w-12 h-12 bg-yellow-500/10 rounded-full flex items-center justify-center group-hover:bg-yellow-500 transition-all duration-300">
-                      {React.cloneElement(item.icon, { 
-                        size: 24, 
-                        className: "text-yellow-500 group-hover:text-black transition-colors"
-                      })}
-                    </div>
-                    <div className="text-5xl font-black text-zinc-800 group-hover:text-yellow-500/20 transition-colors">
-                      {item.step}
-                    </div>
+              {
+                number: "01",
+                title: "Custom Electronics Design & Manufacturing",
+                description: "From idea to mass production — we design, prototype, validate and manufacture customized electronic products.",
+                image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=600&auto=format&fit=crop" 
+              },
+              {
+                number: "02",
+                title: "Electronics Engineering Consulting",
+                description: "Expert guidance in product architecture, testing, cost optimization, DFM/DFA and bulk manufacturing.",
+                image: "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=600&auto=format&fit=crop" // REPLACED: Reliable Engineering Image
+              },
+              {
+                number: "03",
+                title: "Tech Product Sourcing",
+                description: "We help source reliable tech products directly from China with quality assurance.",
+                image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop" 
+              },
+              // Duplicate Set for Infinite Scroll
+               {
+                number: "01",
+                title: "Custom Electronics Design & Manufacturing",
+                description: "From idea to mass production — we design, prototype, validate and manufacture customized electronic products.",
+                image: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=600&auto=format&fit=crop" 
+              },
+              {
+                number: "02",
+                title: "Electronics Engineering Consulting",
+                description: "Expert guidance in product architecture, testing, cost optimization, DFM/DFA and bulk manufacturing.",
+                image: "https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=600&auto=format&fit=crop" 
+              },
+              {
+                number: "03",
+                title: "Tech Product Sourcing",
+                description: "We help source reliable tech products directly from China with quality assurance.",
+                image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=600&auto=format&fit=crop" 
+              }
+            ].map((service, index) => (
+              <div 
+                key={index} 
+                className="flex-none w-[85vw] sm:w-[400px] group relative rounded-3xl overflow-hidden h-[450px] shadow-2xl border border-white/10"
+              >
+                {/* Background Image */}
+                <div className="absolute inset-0">
+                   <img 
+                    src={service.image} 
+                    alt={service.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  {/* Overlay Gradient - LIGHTENED as per request */}
+                  <div className="absolute inset-0 bg-linear-to-t from-[#143d2d]/80 via-[#143d2d]/20 to-transparent"></div>
+                </div>
+
+                {/* Content */}
+                <div className="absolute inset-0 p-8 flex flex-col justify-end">
+                  <div className="absolute top-8 left-8">
+                     <span className="text-6xl font-black text-white/20 select-none">
+                       {service.number}
+                     </span>
                   </div>
-                  <h4 className="text-xl font-black text-white mb-2 group-hover:text-yellow-500 transition-colors">
-                    {item.title}
-                  </h4>
-                  <p className="text-zinc-400 text-sm leading-relaxed">
-                    {item.desc}
+                  
+                  <h3 className="text-2xl font-bold mb-4 text-white relative z-10">
+                    {service.title}
+                  </h3>
+                  
+                  <p className="text-gray-100 text-sm leading-relaxed mb-6 pl-4 font-medium backdrop-blur-sm bg-black/10 p-2 rounded-r-lg">
+                    {service.description}
                   </p>
                 </div>
               </div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Scroll To Top Button */}
-      <button 
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className="fixed bottom-8 right-8 z-50 bg-yellow-500 text-black p-4 rounded-full shadow-2xl hover:bg-yellow-400 hover:scale-110 transition-all duration-300 group"
-        title="Back to Top"
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-        </svg>
-      </button>
-
-      {/* ================= FAQ SECTION ================= */}
-      <section id="faq" className="py-24 bg-zinc-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-           <div className="flex flex-col lg:flex-row gap-16">
-              
-              {/* Left: FAQ */}
-              <div className="flex-1">
-                 <div className="inline-block mb-6 px-6 py-2 bg-yellow-500 text-black font-bold uppercase tracking-widest text-xs rounded-full shadow-lg">
-                   Explore FAQ's
-                 </div>
-                 <h2 className="text-4xl md:text-5xl font-black text-white mb-4 leading-tight">
-                   Frequently Asked <br/> 
-                   <span className="text-yellow-500">Questions</span>
-                 </h2>
-                 <p className="text-zinc-400 mb-12 text-lg">
-                   Find answers to common queries about our services, processes, and support.
-                 </p>
-
-                 <div className="space-y-4">
-                    {[
-                      { 
-                        q: "Why should I choose IRK Innovations?", 
-                        a: "With over 10 years of industry experience, we deliver end-to-end electronic solutions from concept to installation. Our industrial-grade quality, cost optimization, and global client base set us apart. We provide comprehensive support and maintain a 98% client satisfaction rate." 
-                      },
-                      { 
-                        q: "What is your product development process?", 
-                        a: "We follow a structured approach: consultation and requirement analysis, architecture and PCB design, prototyping and testing, DFM/DFA optimization, bulk manufacturing, and finally delivery with installation support. Every step is quality-controlled." 
-                      },
-                      { 
-                        q: "Can you optimize costs for large-scale production?", 
-                        a: "Absolutely. We specialize in BOM optimization and DFM/DFA to reduce manufacturing costs without compromising quality. Our bulk manufacturing capabilities allow us to offer competitive pricing for large orders." 
-                      },
-                      { 
-                        q: "Do you handle international projects & sourcing?", 
-                        a: "Yes! We serve clients globally and specialize in sourcing components from China and other international markets. We handle customs, shipping, and provide localized support through our partner network." 
-                      }
-                    ].map((faq, i) => (
-                      <div 
-                        key={i} 
-                        className="bg-zinc-950 border border-zinc-800 rounded-lg hover:border-yellow-500/30 transition-all duration-300 overflow-hidden"
-                      >
-                        <button 
-                          onClick={() => toggleFaq(i)}
-                          className="w-full flex justify-between items-center p-6 text-left group"
-                        >
-                           <span className="text-lg font-bold text-white group-hover:text-yellow-500 transition-colors pr-4">
-                             {faq.q}
-                           </span>
-                           <div className={`shrink-0 w-10 h-10 bg-yellow-500 rounded-lg flex items-center justify-center transition-all duration-300 ${expandedFaq === i ? 'rotate-180 bg-yellow-400' : ''}`}>
-                             {expandedFaq === i ? (
-                               <Minus size={20} className="text-black" strokeWidth={3} />
-                             ) : (
-                               <Plus size={20} className="text-black" strokeWidth={3} />
-                             )}
-                           </div>
-                        </button>
-                        <div 
-                          className={`transition-all duration-500 ease-in-out ${
-                            expandedFaq === i 
-                              ? 'max-h-96 opacity-100' 
-                              : 'max-h-0 opacity-0'
-                          } overflow-hidden`}
-                        >
-                          <div className="px-6 pb-6 text-zinc-400 leading-relaxed border-t border-zinc-900 pt-4">
-                             {faq.a}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                 </div>
-              </div>
-
-              {/* Right: Images */}
-              <div className="flex-1 relative hidden lg:block">
-                 <div className="relative grid grid-cols-2 gap-6 mt-24">
-                    <div className="space-y-6">
-                      <div className="relative overflow-hidden rounded-xl group">
-                        <img 
-                          src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=800&auto=format&fit=crop" 
-                          className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110" 
-                          alt="Electronics Testing" 
-                        />
-                        <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
-                      </div>
-                      <div className="relative overflow-hidden rounded-xl group">
-                        <img 
-                          src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?q=80&w=800&auto=format&fit=crop" 
-                          className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110" 
-                          alt="Manufacturing" 
-                        />
-                        <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
-                      </div>
-                    </div>
-                    <div className="space-y-6 pt-12">
-                      <div className="relative overflow-hidden rounded-xl group">
-                        <img 
-                          src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=800&auto=format&fit=crop" 
-                          className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110" 
-                          alt="PCB Design" 
-                        />
-                        <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
-                      </div>
-                      <div className="relative overflow-hidden rounded-xl group">
-                        <img 
-                          src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=800&auto=format&fit=crop" 
-                          className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110" 
-                          alt="Circuit Board" 
-                        />
-                        <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent"></div>
-                      </div>
-                    </div>
-                 </div>
-
-                 {/* Decorative Element */}
-                 <div className="absolute -top-8 -right-8 w-32 h-32 bg-yellow-500/10 rounded-full blur-3xl"></div>
-                 <div className="absolute -bottom-8 -left-8 w-40 h-40 bg-yellow-500/10 rounded-full blur-3xl"></div>
-              </div>
-
-           </div>
-        </div>
-      </section>
-
-      {/* ================= PROJECTS SECTION ================= */}
-      <section id="projects" className="py-24 bg-zinc-950 border-t border-zinc-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12 pb-8 border-b border-zinc-800">
-            <div>
-              <div className="inline-block mb-3 px-4 py-1.5 bg-yellow-500/10 border border-yellow-500/30 rounded-full">
-                <span className="text-yellow-500 font-bold tracking-widest uppercase text-xs">Our Work</span>
-              </div>
-              <h3 className="text-4xl md:text-5xl font-black text-white">Featured Projects</h3>
-            </div>
-            <Link to="/projects" className="hidden md:flex items-center gap-2 text-zinc-400 hover:text-yellow-500 font-bold uppercase tracking-widest transition-all duration-300 mt-4 md:mt-0 group">
-               View All Projects
-               <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
+          <div className="text-center">
+             {/* Yellow scroll bar removed as per request */}
+             <p className="text-gray-300 font-medium text-sm">
+                Professional electrical solutions for every need. <a href="#contact" className="text-yellow-400 underline hover:text-yellow-300">Contact Us Today!</a>
+             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        </div>
+      </section>
+
+      {/* ================= WHY CHOOSE US ================= */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 mb-4">
+              <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+              <p className="text-yellow-600 font-bold uppercase tracking-wider text-sm">WHY CHOOSE US</p>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900">
+              Awards and certifications that<br />reflect our excellence
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              {
+                icon: <Award className="text-yellow-500" size={48} />,
+                title: "Licensed company",
+                description: "Certified and registered electronics manufacturing company"
+              },
+              {
+                icon: <Shield className="text-yellow-500" size={48} />,
+                title: "Insured service",
+                description: "All projects covered with comprehensive insurance"
+              },
+              {
+                icon: <Star className="text-yellow-500" size={48} />,
+                title: "Certified technicians",
+                description: "Highly trained and certified electronics engineers"
+              },
+              {
+                icon: <ThumbsUp className="text-yellow-500" size={48} />,
+                title: "Trusted experts",
+                description: "Over 10 years of industry experience and expertise"
+              }
+            ].map((item, index) => (
+              <div key={index} className="text-center">
+                <div className="w-24 h-24 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-yellow-100">
+                  {item.icon}
+                </div>
+                <h3 className="text-xl font-black text-gray-900 mb-3">{item.title}</h3>
+                <p className="text-gray-600 leading-relaxed">{item.description}</p>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ================= OUR GOALS / IMAGE GRID ================= */}
+      <section className="py-20 bg-white relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            
+            {/* LEFT COLUMN: Content */}
+            <div className="order-2 lg:order-1">
+              {/* Subtitle */}
+              <div className="inline-flex items-center gap-2 mb-6">
+                <span className="w-2 h-2 rounded-full bg-emerald-700"></span>
+                <p className="text-gray-900 font-bold uppercase tracking-wider text-sm">OUR GOALS</p>
+              </div>
+              
+              <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-6 leading-tight">
+                Our goals to deliver top-notch <span className="text-yellow-400">electrical solutions</span>
+              </h2>
+              
+              <p className="text-gray-600 text-lg leading-relaxed mb-10">
+                Our goal is to be a leader in providing environmentally conscious electrical services. We focus on energy-efficient solutions and sustainable practices to not only meet industry standards but to exceed them.
+              </p>
+
+              {/* Feature Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+                {/* Card 1 */}
+                <div className="p-6 rounded-3xl border border-gray-100 shadow-xl bg-white hover:shadow-2xl transition-shadow duration-300">
+                  <div className="w-14 h-14 rounded-full bg-emerald-50 flex items-center justify-center mb-6 text-emerald-700">
+                    <Sparkles size={32} strokeWidth={1.5} />
+                  </div>
+                  <h3 className="font-bold text-xl mb-3 text-gray-900">Commitment To Innovation</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed">We strive to continuously innovate, incorporating modern tech into our workflow.</p>
+                </div>
+                
+                {/* Card 2 */}
+                <div className="p-6 rounded-3xl border border-gray-100 shadow-xl bg-white hover:shadow-2xl transition-shadow duration-300">
+                  <div className="w-14 h-14 rounded-full bg-emerald-50 flex items-center justify-center mb-6 text-emerald-700">
+                    <Users size={32} strokeWidth={1.5} />
+                  </div>
+                  <h3 className="font-bold text-xl mb-3 text-gray-900">Customer-Centric Focus</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed">We aim to build long-lasting relationships by providing exceptional service.</p>
+                </div>
+              </div>
+
+              {/* Call to Action */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-8">
+                <button className="bg-yellow-400 text-black px-8 py-4 rounded-full font-bold text-lg hover:bg-yellow-500 transition-colors flex items-center gap-2">
+                  Know More <ArrowRight size={20} />
+                </button>
+                
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-[#143d2d] flex items-center justify-center text-white">
+                    <Phone size={20} />
+                  </div>
+                  <div>
+                    <p className="text-gray-500 text-xs font-bold uppercase tracking-wider">Call Us 24/7</p>
+                    <p className="text-gray-900 font-black text-xl">+ 0 (123) 456 789</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT COLUMN: Image Collage */}
+            <div className="order-1 lg:order-2 relative">
+               {/* Grid */}
+               <div className="grid grid-cols-2 gap-4">
+                 <div className="relative h-64 sm:h-80 rounded-tl-[60px] rounded-br-[60px] overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover" alt="Worker" />
+                 </div>
+                 <div className="relative h-64 sm:h-80 rounded-tr-[60px] rounded-bl-[60px] overflow-hidden mt-8 md:mt-12">
+                    {/* FIXED: Replaced broken Engineer image with a reliable one */}
+                    <img src="https://images.unsplash.com/photo-1581092334651-ddf26d9a09d0?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover" alt="Engineer" />
+                 </div>
+                 <div className="relative h-64 sm:h-80 rounded-bl-[60px] rounded-tr-[60px] overflow-hidden -mt-8 md:-mt-12">
+                    <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover" alt="Circuit" />
+                 </div>
+                 <div className="relative h-64 sm:h-80 rounded-br-[60px] rounded-tl-[60px] overflow-hidden">
+                    <img src="https://images.unsplash.com/photo-1616440347437-b1c73416efc2?q=80&w=600&auto=format&fit=crop" className="w-full h-full object-cover" alt="Panel" />
+                 </div>
+               </div>
+               
+               {/* Center Rotating Logo */}
+               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20">
+                 <div className="relative group cursor-pointer">
+                   {/* Spinning Text/Ring */}
+                   <div className="w-32 h-32 md:w-40 md:h-40 bg-yellow-400 rounded-full flex items-center justify-center animate-[spin_10s_linear_infinite] shadow-2xl border-4 border-white">
+                      {/* Text Path or simple ring effect */}
+                      <svg className="w-full h-full absolute inset-0 text-black/10" viewBox="0 0 100 100">
+                         <path id="curve" d="M 50 50 m -37 0 a 37 37 0 1 1 74 0 a 37 37 0 1 1 -74 0" fill="transparent" />
+                         <text className="text-[10px] font-bold uppercase tracking-widest fill-current">
+                           <textPath href="#curve">
+                             Irk Innovations • Excellence • Innovation •
+                           </textPath>
+                         </text>
+                      </svg>
+                   </div>
+                   
+                   {/* Logo Image in Center (Counter-Rotating to stay upright OR Rotating with it? Request implies rotating element, usually the logo rotates) */}
+                   {/* User said: "oy image mada tiyana circle eka wenuwata ape logo eka danana rotate wenna" -> "Put our logo instead of the circle in the middle of that image, rotating" */}
+                   {/* So the logo itself should rotate. */}
+                   <div className="absolute inset-0 flex items-center justify-center">
+                     <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden bg-white shadow-inner animate-[spin_15s_linear_infinite_reverse]">
+                        <img src="/IRK-Logo.jpg" alt="IRK Logo" className="w-full h-full object-cover" />
+                     </div>
+                   </div>
+                 </div>
+               </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================= PROCESS / ESTIMATES (Green) ================= */}
+      <section className="py-20 bg-linear-to-br from-emerald-700 to-emerald-900 text-white relative overflow-hidden">
+        {/* Background Patterns - Transparent SVGs */}
+        <Activity strokeWidth={1} size={300} className="absolute -top-20 -left-20 text-white opacity-5 pointer-events-none -rotate-12" />
+        <Circle strokeWidth={1} size={400} className="absolute -bottom-32 -right-32 text-white opacity-5 pointer-events-none" />
+        <Square strokeWidth={1} size={200} className="absolute top-20 -right-16 text-white opacity-5 pointer-events-none rotate-45" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-black mb-4">
+              Hassle-free estimates just a<br />click away
+            </h2>
+            <p className="text-xl text-white/90">
+              Simple, transparent process from start to finish
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-16">
+            {[
+              { step: "01", title: "Consultation", desc: "Understanding your requirements", icon: <Users /> },
+              { step: "02", title: "Design", desc: "Architecture & PCB design", icon: <CircuitBoard /> },
+              { step: "03", title: "Manufacturing", desc: "Bulk production with QA", icon: <Factory /> },
+              { step: "04", title: "Delivery", desc: "Installation & support", icon: <Zap /> }
+            ].map((item, index) => (
+              <div key={index} className="text-center">
+                <div className="w-24 h-24 bg-yellow-400 rounded-full flex items-center justify-center mx-auto mb-6">
+                  {React.cloneElement(item.icon, { size: 40, className: "text-gray-900", strokeWidth: 2.5 })}
+                </div>
+                <div className="text-6xl font-black text-white/20 mb-3">{item.step}</div>
+                <h3 className="text-2xl font-black mb-2">{item.title}</h3>
+                <p className="text-white/80">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center border-t border-white/20 pt-16">
+            {[
+              { number: 500, suffix: "+", label: "Happy Clients" },
+              { number: 1000, suffix: "+", label: "Projects Completed" },
+              { number: 2500, suffix: "+", label: "Products Delivered" },
+              { number: 100, suffix: "+", label: "Industry Awards" }
+            ].map((stat, index) => (
+              <div key={index}>
+                <div className="text-5xl md:text-6xl font-black text-yellow-400 mb-2">
+                  <AnimatedCounter end={stat.number} suffix={stat.suffix} />
+                </div>
+                <div className="text-white/90 font-bold text-lg">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ================= FAQ ================= */}
+      <section id="faq" className="py-20 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 mb-4">
+              <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+              <p className="text-yellow-600 font-bold uppercase tracking-wider text-sm">FAQ</p>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900">
+              Common questions about our<br />electronics services
+            </h2>
+          </div>
+
+          <div className="space-y-4">
+            {[
+              { 
+                q: "What types of electronics do you manufacture?", 
+                a: "We manufacture a wide range of electronics including embedded systems, IoT devices, industrial controllers, consumer electronics, and custom PCB assemblies. From concept to mass production." 
+              },
+              { 
+                q: "What is your typical turnaround time?", 
+                a: "Turnaround time varies by project complexity. Prototypes typically take 2-3 weeks, while bulk manufacturing timelines depend on order volume. We provide detailed timelines during consultation." 
+              },
+              { 
+                q: "Do you offer warranty on your products?", 
+                a: "Yes, all our products come with comprehensive warranty coverage. The duration varies based on product type and application. We also offer extended warranty options and ongoing support." 
+              },
+              { 
+                q: "Can you handle international shipping?", 
+                a: "Absolutely! We have experience shipping globally and can handle all customs, documentation, and logistics. We work with trusted shipping partners to ensure safe delivery worldwide." 
+              }
+            ].map((faq, i) => (
+              <div 
+                key={i} 
+                className="bg-white border-2 border-gray-200 rounded-xl hover:border-emerald-500 transition-all duration-300 overflow-hidden shadow-sm hover:shadow-lg"
+              >
+                <button 
+                  onClick={() => toggleFaq(i)}
+                  className="w-full flex justify-between items-center p-6 text-left"
+                >
+                  <span className="text-lg font-black text-gray-900 pr-4">
+                    {faq.q}
+                  </span>
+                  <div className={`shrink-0 w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center transition-transform duration-300 ${expandedFaq === i ? 'rotate-180' : ''}`}>
+                    {expandedFaq === i ? (
+                      <Minus size={24} className="text-white" strokeWidth={3} />
+                    ) : (
+                      <Plus size={24} className="text-white" strokeWidth={3} />
+                    )}
+                  </div>
+                </button>
+                <div 
+                  className={`transition-all duration-500 ease-in-out ${
+                    expandedFaq === i 
+                      ? 'max-h-96 opacity-100' 
+                      : 'max-h-0 opacity-0'
+                  } overflow-hidden`}
+                >
+                  <div className="px-6 pb-6 text-gray-600 leading-relaxed text-lg border-t-2 border-gray-100 pt-4">
+                    {faq.a}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* ================= CONTACT CTA (Parallax & Boxed) ================= */}
+      <div className="py-6 bg-white">
+        <section className="relative py-8 bg-black overflow-hidden mx-4 md:mx-8 lg:mx-12 rounded-[40px] shadow-2xl isolate">
+          {/* Parallax Background Image */}
+          <div 
+            className="absolute inset-0 bg-fixed bg-cover bg-center opacity-40 pointer-events-none -z-10"
+            style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1504384764586-bb4cdc1707b0?q=80&w=2000&auto=format&fit=crop")' }} 
+          ></div>
+          
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-linear-to-r from-black via-black/80 to-transparent -z-10"></div>
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            
+            {/* LEFT: Text Content */}
+            <div className="text-white">
+              <div className="inline-flex items-center gap-2 mb-4">
+                <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+                <p className="text-yellow-400 font-bold uppercase tracking-wider text-sm">CONTACT US</p>
+              </div>
+              
+              <h2 className="text-3xl md:text-4xl font-black mb-4 leading-tight">
+                We're here to answer your<br />
+                <span className="text-yellow-400">questions and help</span>
+              </h2>
+              
+              <p className="text-gray-300 text-base leading-relaxed mb-8 w-full md:w-5/6">
+                Whether you're planning a new project or need emergency support, we're available to provide fast and reliable assistance.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+                <button className="bg-yellow-400 text-black px-6 py-3 rounded-lg font-bold text-base hover:bg-yellow-500 transition-colors flex items-center gap-2">
+                  Contact Us <ArrowRight size={18} />
+                </button>
+                
+                <span className="text-gray-400 font-bold hidden sm:block">OR</span>
+
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center text-black shadow-[0_0_15px_rgba(250,204,21,0.5)]">
+                    <Phone size={20} />
+                  </div>
+                  <div>
+                    <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider">CALL US ANY TIME</p>
+                    <p className="text-white font-black text-lg text-nowrap">+ 0 (123) 456 789</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* RIGHT: Contact Form (Moved from Hero) */}
+            <div className="relative w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 sm:p-8 shadow-2xl border border-white/20">
+                <h3 className="text-2xl font-black text-white mb-6">
+                  Get a Quote Now!
+                </h3>
+                  
+                <form className="space-y-4">
+                  <input 
+                    type="text" 
+                    placeholder="Your Name" 
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:border-yellow-400 focus:outline-none font-medium transition-colors"
+                  />
+                  <input 
+                    type="email" 
+                    placeholder="Your Email" 
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:border-yellow-400 focus:outline-none font-medium transition-colors"
+                  />
+                  <input 
+                    type="tel" 
+                    placeholder="Phone Number" 
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:border-yellow-400 focus:outline-none font-medium transition-colors"
+                  />
+                  <textarea 
+                    placeholder="Your Message" 
+                    rows="4"
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-gray-400 focus:border-yellow-400 focus:outline-none font-medium resize-none transition-colors"
+                  ></textarea>
+                  <button 
+                    type="submit"
+                    className="w-full bg-yellow-400 text-black py-4 rounded-lg font-bold hover:bg-yellow-500 transition-colors shadow-lg"
+                  >
+                    Send Message
+                  </button>
+                </form>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+      </div>
+
+      {/* ================= PROJECTS SECTION ================= */}
+      <section id="projects" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 mb-4">
+              <span className="w-2 h-2 rounded-full bg-yellow-400"></span>
+              <p className="text-yellow-600 font-bold uppercase tracking-wider text-sm">OUR PORTFOLIO</p>
+            </div>
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4">
+              Discover our latest insights and<br />expert projects
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {apiProjects.length > 0 ? (
               apiProjects.slice(0, 6).map((project) => (
                 <ProjectCard key={project._id} project={project} />
               ))
             ) : (
               <div className="col-span-3 text-center py-20">
-                <div className="inline-block p-8 bg-zinc-900 border border-zinc-800 rounded-xl">
-                  <p className="text-zinc-500 text-lg">No projects to display at the moment.</p>
-                </div>
+                <p className="text-gray-500 text-lg">No projects to display at the moment.</p>
               </div>
             )}
           </div>
 
-          <div className="mt-16 text-center md:hidden">
-            <Link to="/projects" className="inline-flex items-center gap-3 bg-zinc-900 border border-zinc-700 text-white px-10 py-4 uppercase tracking-widest font-bold hover:border-yellow-500 hover:bg-yellow-500/10 transition-all duration-300 rounded-lg">
+          <div className="text-center">
+            <Link 
+              to="/projects" 
+              className="inline-flex items-center gap-2 bg-emerald-600 text-white px-10 py-4 rounded-lg font-bold hover:bg-emerald-700 transition-all duration-300 shadow-lg"
+            >
               View All Projects
-              <ArrowRight size={18} />
+              <ArrowRight size={20} />
             </Link>
           </div>
-
 
         </div>
       </section>
 
-      {/* ================= CONTACT CTA ================= */}
-      <section id="contact" className="py-24 bg-yellow-500 relative overflow-hidden text-black">
-         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10"></div>
-         
-         <div className="max-w-4xl mx-auto px-4 text-center relative z-10">
-            <h2 className="text-4xl md:text-6xl font-black uppercase italic mb-6 tracking-tighter">
-               Ready to Start?
-            </h2>
-            <p className="text-xl md:text-2xl font-medium mb-10 max-w-2xl mx-auto border-black/10">
-               Let's engineer the future together. Get in touch for a consultation.
-            </p>
-            
-            <div className="flex flex-col md:flex-row justify-center gap-8 mb-12">
-               <div className="flex items-center justify-center gap-3">
-                  <div className="bg-black/10 p-2 rounded-full"><Phone size={24}/></div>
-                  <span className="font-bold text-lg">+94 76 537 6106</span>
-               </div>
-               <div className="flex items-center justify-center gap-3">
-                  <div className="bg-black/10 p-2 rounded-full"><Mail size={24}/></div>
-                  <span className="font-bold text-lg">info@irkinnovations.com</span>
-               </div>
-               <div className="flex items-center justify-center gap-3">
-                  <div className="bg-black/10 p-2 rounded-full"><MapPin size={24}/></div>
-                  <span className="font-bold text-lg">Colombo, Sri Lanka</span>
-               </div>
-            </div>
-
-            <button className="bg-black text-white px-12 py-5 font-bold uppercase tracking-widest text-lg hover:scale-105 transition-transform shadow-2xl">
-               Request Free Consultation
-            </button>
-         </div>
+      {/* ================= BLOG CTA ================= */}
+      <section className="py-20 bg-linear-to-br from-emerald-700 to-emerald-900 text-white">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-4xl md:text-5xl font-black mb-6">
+            Discover our latest insights and<br />expert advice
+          </h2>
+          <p className="text-xl mb-10 text-white/90">
+            Stay updated with the latest trends in electronics design and manufacturing
+          </p>
+          <button className="bg-yellow-400 text-gray-900 px-10 py-4 rounded-lg font-bold text-lg hover:bg-yellow-500 transition-all duration-300 shadow-xl">
+            Read Our Blog
+          </button>
+        </div>
       </section>
 
-      <Footer />
+      {/* ================= FOOTER ================= */}
+      <footer className="bg-linear-to-br from-emerald-800 to-emerald-950 text-white pt-16 pb-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          
+          {/* Main Footer Content */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
+            
+            {/* Company Info */}
+            <div>
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-10 h-10 bg-yellow-400 rounded-lg flex items-center justify-center">
+                  <Zap size={24} className="text-gray-900" />
+                </div>
+                <span className="text-2xl font-black">IRK Innovations</span>
+              </div>
+              <p className="text-emerald-200 leading-relaxed mb-6">
+                Leading electronics product design and manufacturing company with 10+ years of experience.
+              </p>
+              <div className="flex gap-3">
+                <a href="#" className="w-10 h-10 bg-white/10 hover:bg-yellow-400 rounded-lg flex items-center justify-center transition-all duration-300 group">
+                  <Facebook size={20} className="group-hover:text-gray-900" />
+                </a>
+                <a href="#" className="w-10 h-10 bg-white/10 hover:bg-yellow-400 rounded-lg flex items-center justify-center transition-all duration-300 group">
+                  <Twitter size={20} className="group-hover:text-gray-900" />
+                </a>
+                <a href="#" className="w-10 h-10 bg-white/10 hover:bg-yellow-400 rounded-lg flex items-center justify-center transition-all duration-300 group">
+                  <Instagram size={20} className="group-hover:text-gray-900" />
+                </a>
+                <a href="#" className="w-10 h-10 bg-white/10 hover:bg-yellow-400 rounded-lg flex items-center justify-center transition-all duration-300 group">
+                  <Linkedin size={20} className="group-hover:text-gray-900" />
+                </a>
+              </div>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h3 className="text-xl font-black mb-6">Quick Links</h3>
+              <ul className="space-y-3">
+                {['About Us', 'Services', 'Projects', 'Contact', 'Blog'].map((link) => (
+                  <li key={link}>
+                    <a href="#" className="text-emerald-200 hover:text-yellow-400 transition-colors font-medium">
+                      {link}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Services */}
+            <div>
+              <h3 className="text-xl font-black mb-6">Our Services</h3>
+              <ul className="space-y-3">
+                {[
+                  'PCB Design',
+                  'Manufacturing',
+                  'Product Testing',
+                  'Consultation',
+                  'Assembly'
+                ].map((service) => (
+                  <li key={service}>
+                    <a href="#" className="text-emerald-200 hover:text-yellow-400 transition-colors font-medium">
+                      {service}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Contact Info */}
+            <div>
+              <h3 className="text-xl font-black mb-6">Contact Info</h3>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <MapPin size={20} className="text-yellow-400 shrink-0 mt-1" />
+                  <div>
+                    <p className="text-emerald-200 font-medium">Colombo, Sri Lanka</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Phone size={20} className="text-yellow-400 shrink-0 mt-1" />
+                  <div>
+                    <p className="text-emerald-200 font-medium">076 537 6106</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Mail size={20} className="text-yellow-400 shrink-0 mt-1" />
+                  <div>
+                    <p className="text-emerald-200 font-medium">info@irkinnovations.com</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="border-t border-emerald-700 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <p className="text-emerald-200 text-sm">
+                © 2026 IRK Innovations. All rights reserved.
+              </p>
+              <div className="flex gap-6">
+                <a href="#" className="text-emerald-200 hover:text-yellow-400 text-sm font-medium transition-colors">
+                  Privacy Policy
+                </a>
+                <a href="#" className="text-emerald-200 hover:text-yellow-400 text-sm font-medium transition-colors">
+                  Terms of Service
+                </a>
+                <a href="#" className="text-emerald-200 hover:text-yellow-400 text-sm font-medium transition-colors">
+                  Cookie Policy
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </footer>
+
+      {/* Scroll To Top Button */}
+      <button 
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        className="fixed bottom-8 right-8 z-50 bg-emerald-600 text-white p-4 rounded-full shadow-2xl hover:bg-emerald-700 hover:scale-110 transition-all duration-300"
+        title="Back to Top"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        </svg>
+      </button>
 
     </div>
   );

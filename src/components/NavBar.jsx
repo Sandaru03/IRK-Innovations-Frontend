@@ -2,11 +2,15 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, CheckCircle, Zap, Phone } from 'lucide-react';
 
-const NavBar = () => {
+const NavBar = ({ position = "fixed" }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const navClasses = position === "fixed" 
+    ? "fixed w-full z-50 bg-zinc-950/90 backdrop-blur-md border-b border-yellow-500/20"
+    : "w-full bg-zinc-950/90 backdrop-blur-md border-b border-yellow-500/20";
+
   return (
-    <nav className="fixed w-full z-50 bg-zinc-950/90 backdrop-blur-md border-b border-yellow-500/20">
+    <nav className={navClasses}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           
