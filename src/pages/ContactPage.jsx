@@ -29,7 +29,7 @@ const ContactPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/contact', formData);
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/contact`, formData);
       toast.success(response.data.message || 'Message sent successfully!');
       setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (error) {

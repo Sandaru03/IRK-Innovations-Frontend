@@ -34,7 +34,7 @@ const Dashboard = () => {
 
   const fetchProjects = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/projects');
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/projects`);
       setProjects(response.data);
       setLoading(false);
     } catch (error) {
@@ -117,9 +117,9 @@ const Dashboard = () => {
     e.preventDefault();
     try {
       if (editingProject) {
-        await axios.put(`http://localhost:5000/api/projects/${editingProject._id}`, formData, config);
+        await axios.put(`${import.meta.env.VITE_API_URL}/projects/${editingProject._id}`, formData, config);
       } else {
-        await axios.post('http://localhost:5000/api/projects', formData, config);
+        await axios.post(`${import.meta.env.VITE_API_URL}/projects`, formData, config);
       }
       
       fetchProjects();
@@ -171,7 +171,7 @@ const Dashboard = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this project?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/projects/${id}`, config);
+        await axios.delete(`${import.meta.env.VITE_API_URL}/projects/${id}`, config);
         fetchProjects();
       } catch (error) {
         console.error('Error deleting project:', error);
