@@ -153,6 +153,7 @@ const HomePage = () => {
   }, []);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const updateHeaderHeight = () => {
       if (headerRef.current) {
         setHeaderHeight(headerRef.current.offsetHeight);
@@ -223,11 +224,11 @@ const HomePage = () => {
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
                   <Phone size={16} />
-                  <span className="font-medium">076 537 6106</span>
+                  <span className="font-medium">+94 76 537 6106</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail size={16} />
-                  <span className="font-medium">info@irkinnovations.com</span>
+                  <span className="font-medium">irkinnovations2022@gmail.com</span>
                 </div>
               </div>
               <div className="flex items-center gap-4">

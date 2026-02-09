@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
 import { 
@@ -191,9 +192,9 @@ const ServicesPage = () => {
                       </li>
                     ))}
                   </ul>
-                  <button className="w-full bg-yellow-400 text-emerald-950 font-black py-5 rounded-2xl hover:bg-white hover:scale-[1.02] transition-all flex items-center justify-center gap-3">
+                  <Link to="/contact" className="w-full bg-yellow-400 text-emerald-950 font-black py-5 rounded-2xl hover:bg-white hover:scale-[1.02] transition-all flex items-center justify-center gap-3">
                     Start Sourcing Today <ArrowRight size={20} />
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -212,12 +213,10 @@ const ServicesPage = () => {
               Consult with our engineering team today and let's build your next innovation together.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-yellow-400 text-emerald-950 px-10 py-5 rounded-2xl font-black text-lg hover:bg-white transition-all shadow-xl">
-                Get a Free Consultation
-              </button>
-              <button className="bg-transparent border-2 border-white/30 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-white/10 transition-all">
+            
+              <Link to="/projects" className="bg-transparent border-2 border-white/30 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-white/10 transition-all">
                 View Our Projects
-              </button>
+              </Link>
             </div>
           </div>
         </div>

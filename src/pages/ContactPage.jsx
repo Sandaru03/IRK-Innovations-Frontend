@@ -50,14 +50,14 @@ const ContactPage = () => {
     { 
       icon: <Mail size={24} />, 
       title: "Email Us", 
-      content: "info@volteng.com", 
+      content: "irkinnovations2022@gmail.com", 
       sub: "Online support 24/7",
-      link: "mailto:info@volteng.com" 
+      link: "irkinnovations2022@gmail.com" 
     },
     { 
       icon: <MapPin size={24} />, 
       title: "Visit Us", 
-      content: "No. 123, Innovation Drive", 
+      content: "Sample", 
       sub: "Colombo, Sri Lanka",
       link: "#" 
     }
@@ -95,7 +95,7 @@ const ContactPage = () => {
 
             <div className="space-y-6">
               {contactInfo.map((item, i) => (
-                <a href={item.link} key={i} className="flex gap-6 p-6 bg-gray-50 rounded-[2rem] border border-gray-100 hover:border-emerald-200 hover:bg-white hover:shadow-xl transition-all group">
+                <a href={item.link} key={i} className="flex gap-6 p-6 bg-gray-50 rounded-4xl border border-gray-100 hover:border-emerald-200 hover:bg-white hover:shadow-xl transition-all group">
                   <div className="bg-emerald-900 text-yellow-400 p-4 rounded-2xl shadow-lg group-hover:scale-110 transition-transform">
                     {item.icon}
                   </div>

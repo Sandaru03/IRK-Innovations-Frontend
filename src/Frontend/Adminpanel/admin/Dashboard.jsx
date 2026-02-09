@@ -10,9 +10,9 @@ const Dashboard = () => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    shortDescription: '',
     mainImage: '',
     detailImages: [],
-    video: '',
     liveLink: ''
   });
   const [uploading, setUploading] = useState(false);
@@ -56,9 +56,16 @@ const Dashboard = () => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    if (type === 'detailImages') {
+      if (formData.detailImages.length + files.length > 8) {
+        alert('You can only add a maximum of 8 detail images.');
+        return;
+      }
+    }
+
     setUploading(true);
     try {
-      if (type === 'mainImage' || type === 'video') {
+      if (type === 'mainImage') {
         const file = files[0];
         const fileExt = file.name.split('.').pop();
         const fileName = `${Math.random()}.${fileExt}`;
@@ -99,6 +106,13 @@ const Dashboard = () => {
     }
   };
 
+  const removeDetailImage = (indexToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      detailImages: prev.detailImages.filter((_, index) => index !== indexToRemove)
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -111,7 +125,7 @@ const Dashboard = () => {
       fetchProjects();
       closeModal();
     } catch (error) {
-alert('Error saving project');
+      alert('Error saving project');
       console.error(error);
     }
   };
@@ -122,9 +136,9 @@ alert('Error saving project');
       setFormData({
         title: project.title,
         description: project.description,
+        shortDescription: project.shortDescription || '',
         mainImage: project.mainImage,
         detailImages: project.detailImages || [],
-        video: project.video || '',
         liveLink: project.liveLink || ''
       });
     } else {
@@ -132,9 +146,9 @@ alert('Error saving project');
       setFormData({
         title: '',
         description: '',
+        shortDescription: '',
         mainImage: '',
         detailImages: [],
-        video: '',
         liveLink: ''
       });
     }
@@ -147,9 +161,9 @@ alert('Error saving project');
     setFormData({
       title: '',
       description: '',
+      shortDescription: '',
       mainImage: '',
       detailImages: [],
-      video: '',
       liveLink: ''
     });
   };
@@ -168,20 +182,26 @@ alert('Error saving project');
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-zinc-900 flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-white dark:bg-zinc-800 shadow-lg hidden md:block">
-        <div className="p-6">
+      <aside className="w-64 bg-white dark:bg-zinc-800 shadow-lg hidden md:flex h-screen fixed top-0 left-0 z-40 flex-col justify-between">
+        <div>
+          <div className="p-6">
           <h1 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
             <LayoutDashboard className="w-8 h-8" />
             Admin Panel
           </h1>
         </div>
-        <nav className="mt-6 px-4">
-          <a href="#" className="flex items-center gap-3 px-4 py-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-lg">
-            <LayoutDashboard className="w-5 h-5" />
-            Projects
-          </a>
-        </nav>
-        <div className="absolute bottom-0 w-64 p-4 border-t border-gray-200 dark:border-zinc-700">
+          <nav className="mt-6 px-4 space-y-2">
+            <a href="#" className="flex items-center gap-3 px-4 py-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-lg">
+              <LayoutDashboard className="w-5 h-5" />
+              Projects
+            </a>
+            <a href="/" target="_blank" className="flex items-center gap-3 px-4 py-3 text-zinc-600 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:bg-zinc-700/50 rounded-lg transition-colors">
+              <LinkIcon className="w-5 h-5" />
+              Go to Home
+            </a>
+          </nav>
+        </div>
+        <div className="p-4 border-t border-gray-200 dark:border-zinc-700">
           <button
             onClick={handleLogout}
             className="flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 w-full rounded-lg transition-colors"
@@ -193,7 +213,7 @@ alert('Error saving project');
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8 overflow-y-auto">
+      <main className="flex-1 p-8 ml-0 md:ml-64 overflow-y-auto">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">Project Management</h2>
           <button
@@ -228,7 +248,7 @@ alert('Error saving project');
               </div>
               <div className="p-4">
                 <h3 className="font-bold text-lg text-zinc-900 dark:text-white mb-2">{project.title}</h3>
-                <p className="text-zinc-500 dark:text-zinc-400 text-sm line-clamp-2 mb-4">{project.description}</p>
+                <p className="text-zinc-500 dark:text-zinc-400 text-sm line-clamp-2 mb-4">{project.shortDescription || project.description}</p>
               </div>
             </div>
           ))}
@@ -262,16 +282,30 @@ alert('Error saving project');
                     required
                   />
                 </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Short Description</label>
+                  <textarea
+                    name="shortDescription"
+                    value={formData.shortDescription}
+                    onChange={handleChange}
+                    rows="2"
+                    className="w-full rounded-lg border-zinc-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white p-2 border"
+                    required
+                    placeholder="Brief summary for the project card..."
+                  ></textarea>
+                </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Description</label>
+                  <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Full Description</label>
                   <textarea
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
-                    rows="3"
+                    rows="4"
                     className="w-full rounded-lg border-zinc-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white p-2 border"
                     required
+                    placeholder="Detailed project description..."
                   ></textarea>
                 </div>
 
@@ -297,40 +331,36 @@ alert('Error saving project');
 
                   {/* Detail Images Upload */}
                   <div>
-                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Detail Images</label>
+                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                      Detail Images (Max 8) - {formData.detailImages.length}/8
+                    </label>
                     <input
                       type="file"
                       accept="image/*"
                       multiple
                       onChange={(e) => handleFileUpload(e, 'detailImages')}
                       className="w-full rounded-lg border-zinc-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white p-2 border"
-                      disabled={uploading}
+                      disabled={uploading || formData.detailImages.length >= 8}
                     />
                      {formData.detailImages.length > 0 && (
                         <div className="flex gap-2 mt-2 flex-wrap">
                           {formData.detailImages.map((img, idx) => (
-                             <div key={idx} className="h-10 w-10 rounded overflow-hidden">
+                             <div key={idx} className="relative h-16 w-16 rounded overflow-hidden group">
                                <img src={img} alt={`Detail ${idx}`} className="h-full w-full object-cover"/>
+                               <button
+                                 type="button"
+                                 onClick={() => removeDetailImage(idx)}
+                                 className="absolute top-0 right-0 bg-red-600 text-white p-0.5 rounded-bl-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                               >
+                                 <Trash2 size={12} />
+                               </button>
                              </div>
                           ))}
                         </div>
                       )}
                   </div>
 
-                  {/* Video Upload */}
-                  <div>
-                    <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Project Video</label>
-                    <div className="flex items-center gap-2">
-                       <input
-                        type="file"
-                        accept="video/*"
-                        onChange={(e) => handleFileUpload(e, 'video')}
-                        className="w-full rounded-lg border-zinc-300 dark:border-zinc-600 dark:bg-zinc-700 dark:text-white p-2 border"
-                        disabled={uploading}
-                      />
-                       {formData.video && <span className="text-green-500 text-sm">Video uploaded</span>}
-                    </div>
-                  </div>
+
 
                   <div>
                     <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Live Link (Optional)</label>

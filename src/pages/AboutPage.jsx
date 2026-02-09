@@ -291,9 +291,7 @@ const AboutPage = () => {
               <Link to="/contact" className="bg-emerald-900 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-emerald-800 transition-all shadow-xl shadow-emerald-900/20">
                 Get in Touch
               </Link>
-              <button className="bg-yellow-400 text-emerald-950 px-10 py-5 rounded-2xl font-black text-lg hover:bg-emerald-950 hover:text-white transition-all">
-                Book a Consultation
-              </button>
+            
             </div>
           </div>
         </div>

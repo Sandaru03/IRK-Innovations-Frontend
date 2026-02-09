@@ -27,7 +27,7 @@ const ProjectCard = ({ project }) => {
 
         {/* Description */}
         <p className="text-gray-500 text-sm leading-relaxed mb-4 line-clamp-2">
-          {project.description}
+          {project.shortDescription || project.description}
         </p>
 
         {/* Read More Link */}
